@@ -32,6 +32,7 @@ from placement_Cluster_Edge import CloudPlacement,FogPlacement
 
 
 
+
 def create_application():
     # APLICATION
     a = Application(name="EGG_GAME")

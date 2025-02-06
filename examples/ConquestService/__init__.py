@@ -8,8 +8,8 @@ The following tables list all of the available components in this module.
 """
 from pkgutil import extend_path
 
-from DynamicWorkload import Evolutive_population
-from DynamicWorkload import selection_multipleDeploys
+from ConquestService import jsonDynamicPopulation, selection_multipleDeploys, main, customStrategy
+
 
 def compile_toc(entries, section_marker='='):
     """Compiles a list of sections with objects into sphinx formatted
@@ -26,8 +26,12 @@ def compile_toc(entries, section_marker='='):
 
 
 toc = (
-    ('Evolutive_population'),
+    ('main'),
+    ('customStrategy'),
+    ('jsonDynamicPopulation'),
     ('selection_multipleDeploys'),
+    
+    
     
 )
 

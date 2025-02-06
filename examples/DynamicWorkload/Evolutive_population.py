@@ -7,7 +7,15 @@ import matplotlib.pyplot as plt
 import pandas as pd
 
 class Population_Move(Population):
+    """
+        A subclass of Population that simulates the movement of source generators in a network topology.
 
+        Attributes:
+            number_generators (int): The number of source generators to be deployed.
+            node_dst (int): The destination node towards which the source generators will move.
+            pos (dict): A dictionary containing the position coordinates of nodes in the network topology.
+            activation (int): An integer representing the current activation step of the simulation.
+        """
     def __init__(self,srcs,node_dst, **kwargs):
         self.number_generators = srcs
         self.node_dst = node_dst
@@ -16,6 +24,13 @@ class Population_Move(Population):
         super(Population_Move, self).__init__(**kwargs)
 
     def initial_allocation(self, sim, app_name):
+        """
+        Allocates sources and sinks to nodes in the network topology.
+
+        Args:
+            sim (Sim): The simulation instance.
+            app_name (str): The name of the application being deployed.
+        """
         #ASSIGNAMENT of SOURCE - GENERATORS - ACTUATORS
         id_nodes = list(sim.topology.G.nodes())
         for ctrl in self.src_control:

@@ -5,7 +5,19 @@ import random
 
 
 class Pop_and_Failures(Population):
+    """
+        Represents a population strategy with failures for deployment.
 
+        Parameters:
+          srcs: Number of source generators to deploy.
+          **kwargs: Additional keyword arguments.
+
+        Attributes:
+          number_generators: Number of source generators.
+          nodes_removed: List to store information about removed nodes during failures.
+          count_down: Counter to control the removal of nodes with deployed modules.
+          limit: Limit of removal operations.
+    """
     def __init__(self,srcs, **kwargs):
         self.number_generators = srcs
         self.nodes_removed = []
@@ -33,6 +45,18 @@ class Pop_and_Failures(Population):
 
 
     def getProcessFromThatNode(self,sim,node_to_remove):
+        """
+        Checks if there are processes assigned to the given node and retrieves them.
+
+        Parameters:
+          sim: The simulation environment.
+          node_to_remove: The node to check for assigned processes.
+
+        Returns:
+          is_removable: Boolean indicating whether the node is removable.
+          keys: List of keys for the assigned processes on the node.
+          someModuleDeployed: Boolean indicating if some module is deployed on the node.
+        """
         if node_to_remove in sim.alloc_DES.values():
             someModuleDeployed = False
             keys = []
@@ -64,6 +88,16 @@ class Pop_and_Failures(Population):
 
 
     def run(self, sim):
+        """
+        Executes the failure simulation by removing nodes from the topology.
+
+        Parameters
+        ----------
+          sim: The simulation environment.
+
+        Note:
+          This method simulates node failures by removing nodes from the topology.
+        """
         self.logger.debug("Activiting - Failure -  Removing a topology nodo == a network element, including edges")
         if self.limit >0:
             nodes =list(sim.topology.G.nodes())

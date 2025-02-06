@@ -1,7 +1,9 @@
 import csv
 
 class Metrics:
-
+    """
+        This class is responsible for recording the simulation metrics in CSV files.
+    """
     TIME_LATENCY = "time_latency"
     TIME_WAIT =  "time_wait"
     TIME_RESPONSE = "time_response"

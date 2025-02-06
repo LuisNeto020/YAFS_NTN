@@ -3,7 +3,16 @@ import networkx as nx
 from collections import Counter
 
 class DeviceSpeedAwareRouting(Selection):
+    """
+        This class inherits from Selection class and provides methods for routing messages in a network.
+        It includes functionality for computing the best destination based on device speed awareness.
 
+        Attributes:
+            cache (dict): A dictionary to store cached data.
+            counter (Counter): A counter object to keep track of occurrences of devices.
+            invalid_cache_value (bool): A boolean flag to indicate the validity of cache values.
+            controlServices (dict): A dictionary to control services.
+        """
     def __init__(self):
         self.cache = {}
         self.counter = Counter(list())
@@ -15,6 +24,20 @@ class DeviceSpeedAwareRouting(Selection):
         super(DeviceSpeedAwareRouting, self).__init__()
 
     def compute_BEST_DES(self, node_src, alloc_DES, sim, DES_dst,message):
+        """
+                Computes the best destination based on device speed awareness.
+
+                Args:
+                    node_src: Source node.
+                    alloc_DES: Allocation of DES.
+                    sim: Simulation object.
+                    DES_dst: Destination DES.
+                    message: Message object.
+
+                Returns:
+                    minPath: The shortest path from the source to the destination.
+                    bestDES: The best destination for the message.
+        """
         try:
             bestLong = float('inf')
             minPath = []
@@ -60,6 +83,23 @@ class DeviceSpeedAwareRouting(Selection):
             return [], None
 
     def get_path(self, sim, app_name, message, topology_src, alloc_DES, alloc_module, traffic, from_des):
+        """
+                Gets the path for a message based on routing criteria.
+
+                Args:
+                    sim: Simulation object.
+                    app_name: Name of the application.
+                    message: Message object.
+                    topology_src: Source topology.
+                    alloc_DES: Allocation of Destination End System.
+                    alloc_module: Allocation of modules.
+                    traffic: Traffic object.
+                    from_des: Source of the message.
+
+                Returns:
+                    path: A list containing the path for the message.
+                    des: A list containing the destination for the message.
+        """
         node_src = topology_src #entity that sends the message
         service = message.dst         # Name of the service
         DES_dst = alloc_module[app_name][message.dst] #module sw that can serve the message
@@ -83,7 +123,23 @@ class DeviceSpeedAwareRouting(Selection):
         self.controlServices = {}
 
     def get_path_from_failure(self, sim, message, link, alloc_DES, alloc_module, traffic, ctime, from_des):
+        """
+            Gets a new path for a message in case of failure.
 
+            Args:
+                sim: Simulation object.
+                message: Message object.
+                link: Link object.
+                alloc_DES: Allocation of Destination End System.
+                alloc_module: Allocation of modules.
+                traffic: Traffic object.
+                ctime: Current time.
+                from_des: Source of the message.
+
+            Returns:
+                concPath: A list containing the new path for the message.
+                des: The destination for the message.
+        """
         idx = message.path.index(link[0])
         #print "IDX: ",idx
         if idx == len(message.path):

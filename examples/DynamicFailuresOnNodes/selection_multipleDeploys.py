@@ -12,6 +12,23 @@ class CloudPath_RR(Selection):
 
 
     def get_path(self, sim, app_name, message, topology_src, alloc_DES, alloc_module, traffic, from_des):
+        """
+                Determines the path for a message using the Round Robin (RR) algorithm.
+
+                Parameters:
+                  sim: Simulation environment.
+                  app_name: Name of the application.
+                  message: Message object containing information like destination.
+                  topology_src: Source node in the network.
+                  alloc_DES: Mapping of modules to devices.
+                  alloc_module: Allocation of modules to services.
+                  traffic: Traffic information.
+                  from_des: Source device.
+
+                Returns:
+                  bestPath: Best path for the message.
+                  bestDES: Best destination entity.
+        """
 
         node_src = topology_src
         DES_dst = alloc_module[app_name][message.dst]  # returns an array with all DES process serving
@@ -44,6 +61,16 @@ class BroadPath(Selection):
     def compute_most_near(self,node_src,alloc_DES,sim,DES_dst):
         """
         This functions caches the minimun path among client-devices and fog-devices-Module Calculator and it chooses the best calculator process deployed in that node
+
+        Parameters:
+          node_src: Source node in the network.
+          alloc_DES: Mapping of modules to devices.
+          sim: Simulation environment.
+          DES_dst: Destination entities.
+
+        Returns:
+          minPath: Minimum path.
+          bestDES: the Best destination entity.
         """
         #By Placement policy we know that:
         try:
@@ -75,6 +102,19 @@ class BroadPath(Selection):
         """
         Get the path between a node of the topology and a module deployed in a node. Furthermore it chooses the process deployed in that node.
 
+        Parameters:
+          sim: Simulation environment.
+          app_name: Name of the application.
+          message: Message object containing information like destination.
+          topology_src: Source node in the network.
+          alloc_DES: Mapping of modules to devices.
+          alloc_module: Allocation of modules to services.
+          traffic: Traffic information.
+          from_des: Source device.
+
+        Returns:
+          path: Path for the message.
+          des: Destination entity.
 
         """
         #In this case, there is not a cached system.
@@ -85,7 +125,6 @@ class BroadPath(Selection):
         DES_dst = alloc_module[app_name][message.dst]
 
         currentNodes = len(sim.topology.G.nodes())
-
         # print("DES DST: %s" % DES_dst)
 
         if not self.invalid_cache_value == currentNodes:  # Cache updated
@@ -110,6 +149,28 @@ class BroadPath(Selection):
 
 
     def get_path_from_failure(self, sim, message, link, alloc_DES, alloc_module, traffic, ctime, from_des):
+
+        """
+                Handles path selection when a link failure occurs during message transmission in the network.
+
+                This method is responsible for recalculating the message path and destination entity
+                in response to a specific link failure within the network during message transmission.
+
+                Parameters:
+                  sim: Simulation environment.
+                  message: Message object containing information like destination.
+                  link: Link that failed.
+                  alloc_DES: Mapping of modules to devices.
+                  alloc_module: Allocation of modules to services.
+                  traffic: Traffic information.
+                  ctime: Current time.
+                  from_des: Source device.
+
+                Returns:
+                  concPath: Concatenated path.
+                  des: Destination entity.
+                """
+
         # print("Example of enrouting")
         # print(message.path # [86, 242, 160, 164, 130, 301, 281, 216])
         # print(message.dst_int  # 301)

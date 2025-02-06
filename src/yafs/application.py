@@ -54,10 +54,28 @@ class Message:
         return ("")
 
 def fractional_selectivity(threshold):
+    """
+        Determines whether an event should occur based on a fractional selectivity.
+
+        Args:
+            threshold (float): The threshold value for selectivity. Should be in the range [0, 1].
+
+        Returns:
+            bool: True if the event should occur based on the given threshold, False otherwise.
+    """
     return random.random() <= threshold
 
 
 def create_applications_from_json(data):
+    """
+        Creates application objects from JSON data.
+
+        Args:
+            data (list): A list of dictionaries representing application data in JSON format.
+
+        Returns:
+            dict: A dictionary containing application objects, where keys are application names and values are Application objects.
+    """
     applications = {}
     for app in data:
         a = Application(name=app["name"])

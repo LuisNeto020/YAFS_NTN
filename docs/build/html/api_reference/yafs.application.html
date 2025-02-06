@@ -1,243 +1,297 @@
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>yafs.application &mdash; YAFS 0.3 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=fa44fd50" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=19f00094" />
 
-<html xmlns="http://www.w3.org/1999/xhtml">
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>yafs.application &#8212; YAFS 0.3 documentation</title>
-    <link rel="stylesheet" href="../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../',
-        VERSION:     '0.3',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../_static/jquery.js"></script>
-    <script type="text/javascript" src="../_static/underscore.js"></script>
-    <script type="text/javascript" src="../_static/doctools.js"></script>
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+        <script src="../_static/jquery.js?v=5d32c60e"></script>
+        <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+        <script src="../_static/documentation_options.js?v=b489f392"></script>
+        <script src="../_static/doctools.js?v=888ff710"></script>
+        <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+    <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
     <link rel="next" title="yafs.population" href="yafs.population.html" />
-    <link rel="prev" title="yafs.topology" href="yafs.topology.html" />
-   
-  <link rel="stylesheet" href="../_static/custom.css" type="text/css" />
-  
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+    <link rel="prev" title="yafs.topology" href="yafs.topology.html" /> 
+</head>
 
-  </head>
-  <body>
-  
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
 
-    <div class="document">
-      <div class="documentwrapper">
-        <div class="bodywrapper">
-          <div class="body" role="main">
-            
-  <div class="section" id="module-yafs.application">
-<span id="yafs-application"></span><h1><code class="docutils literal"><span class="pre">yafs.application</span></code><a class="headerlink" href="#module-yafs.application" title="Permalink to this headline">¶</a></h1>
-<dl class="class">
-<dt id="yafs.application.Application">
-<em class="property">class </em><code class="descclassname">yafs.application.</code><code class="descname">Application</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application" title="Permalink to this definition">¶</a></dt>
-<dd><p>An application is defined by a DAG between modules that generate, compute and receive messages.</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>name (str): The name must be unique within the same topology.</dd>
-<dt>Returns:</dt>
-<dd>an application</dd>
-</dl>
-<dl class="attribute">
-<dt id="yafs.application.Application.TYPE_MODULE">
-<code class="descname">TYPE_MODULE</code><em class="property"> = 'MODULE'</em><a class="headerlink" href="#yafs.application.Application.TYPE_MODULE" title="Permalink to this definition">¶</a></dt>
-<dd><p>A module</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yafs.application.Application.TYPE_SINK">
-<code class="descname">TYPE_SINK</code><em class="property"> = 'SINK'</em><a class="headerlink" href="#yafs.application.Application.TYPE_SINK" title="Permalink to this definition">¶</a></dt>
-<dd><p>A sink is like actuator</p>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="yafs.application.Application.TYPE_SOURCE">
-<code class="descname">TYPE_SOURCE</code><em class="property"> = 'SOURCE'</em><a class="headerlink" href="#yafs.application.Application.TYPE_SOURCE" title="Permalink to this definition">¶</a></dt>
-<dd><p>A source is like sensor</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.add_service_module">
-<code class="descname">add_service_module</code><span class="sig-paren">(</span><em>module_name</em>, <em>message_in</em>, <em>message_out=''</em>, <em>distribution=''</em>, <em>module_dest=[]</em>, <em>p=[]</em>, <em>**param</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_service_module"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.add_service_module" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link to each non-pure module a management of transfering of messages</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">module_name (str): module name</p>
-<p>message_in (Message): input message</p>
-<p>message_out (Message): output message. If Empty the module is a sink</p>
-<p>distribution (function): a function with a distribution function</p>
-<p>module_dest (list): a list of modules who can receive this message. Broadcasting.</p>
-<p class="last">p (list): a list of probabilities to send this message. Broadcasting</p>
-</dd>
-<dt>Kwargs:</dt>
-<dd>param (dict): the parameters for <em>distribution</em> function</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.add_service_source">
-<code class="descname">add_service_source</code><span class="sig-paren">(</span><em>module_name</em>, <em>distribution=None</em>, <em>message=None</em>, <em>module_dest=[]</em>, <em>p=[]</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_service_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.add_service_source" title="Permalink to this definition">¶</a></dt>
-<dd><p>Link to each non-pure module a management for creating messages</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">module_name (str): module name</p>
-<p>distribution (function): a function with a distribution function</p>
-<p>message (Message): the message</p>
-<p>module_dest (list): a list of modules who can receive this message. Broadcasting.</p>
-<p class="last">p (list): a list of probabilities to send this message. Broadcasting</p>
-</dd>
-<dt>Kwargs:</dt>
-<dd>param_distribution (dict): the parameters for <em>distribution</em> function</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.add_source_messages">
-<code class="descname">add_source_messages</code><span class="sig-paren">(</span><em>msg</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_source_messages"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.add_source_messages" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add in the application those messages that come from pure sources (sensors). This distinction allows them to be controlled by the (<code class="xref py py-mod docutils literal"><span class="pre">Population</span></code>) algorithm</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.get_message">
-<code class="descname">get_message</code><span class="sig-paren">(</span><em>name</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.get_message" title="Permalink to this definition">¶</a></dt>
-<dd><p>Returns: a message instance from the identifier name</p>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.get_pure_modules">
-<code class="descname">get_pure_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_pure_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.get_pure_modules" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Returns:</dt>
-<dd>a list of pure source and sink modules</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.get_sink_modules">
-<code class="descname">get_sink_modules</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_sink_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.get_sink_modules" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="docutils">
-<dt>Returns:</dt>
-<dd>a list of sink modules</dd>
-</dl>
-</dd></dl>
-
-<dl class="method">
-<dt id="yafs.application.Application.set_modules">
-<code class="descname">set_modules</code><span class="sig-paren">(</span><em>data</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.set_modules"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Application.set_modules" title="Permalink to this definition">¶</a></dt>
-<dd><p>Pure source or sink modules must be typified</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd>data (dict) : a set of characteristic of modules</dd>
-</dl>
-</dd></dl>
-
-</dd></dl>
-
-<dl class="class">
-<dt id="yafs.application.Message">
-<em class="property">class </em><code class="descclassname">yafs.application.</code><code class="descname">Message</code><span class="sig-paren">(</span><em>name</em>, <em>src</em>, <em>dst</em>, <em>instructions=0</em>, <em>bytes=0</em>, <em>broadcasting=False</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Message"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#yafs.application.Message" title="Permalink to this definition">¶</a></dt>
-<dd><p>A message is set by the following values:</p>
-<dl class="docutils">
-<dt>Args:</dt>
-<dd><p class="first">name (str): a name, unique for each application</p>
-<p>src (str): the name of module who send this message</p>
-<p>dst (dst): the nsame of module who recibe this message</p>
-<p>inst (int): the number of instrucctions to be executed ((by default 0), Instead of MIPS, we use IPt since the time is relative to the simulation units.</p>
-<p class="last">bytes (int): the size in bytes (by default 0)</p>
-</dd>
-<dt>Internal args used in the <strong>yafs.core</strong> are:</dt>
-<dd><p class="first">timestamp (float): simulation time. Instant of time that was created.</p>
-<p>path (list): a list of entities of the topology that has to travel to reach its target module from its source module.</p>
-<p>dst_int (int): an identifier of the intermediate entity in which it is in the process of transmission.</p>
-<p class="last">app_name (str): the name of the application</p>
-</dd>
-</dl>
-</dd></dl>
-
+          
+          
+          <a href="../contents.html" class="icon icon-home">
+            YAFS
+          </a>
+              <div class="version">
+                0.3
+              </div>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
 </div>
-
-
-          </div>
-        </div>
-      </div>
-      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
-        <div class="sphinxsidebarwrapper">
-<h3><a href="../contents.html">Table Of Contents</a></h3>
-<ul class="current">
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">OVERVIEW</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../index.html#acknowledge">Acknowledge</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../introduction/index.html">YAFS in 5 Minutes</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../architecture/index.html">Architecture</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../examples/index.html">Examples</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API REFERENCE</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="yafs.html"><code class="docutils literal"><span class="pre">yafs</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.core.html"><code class="docutils literal"><span class="pre">yafs.core</span></code> — Simulator engine</a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.topology.html"><code class="docutils literal"><span class="pre">yafs.topology</span></code></a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal"><span class="pre">yafs.application</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.population.html"><code class="docutils literal"><span class="pre">yafs.population</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.placement.html"><code class="docutils literal"><span class="pre">yafs.placement</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.selection.html"><code class="docutils literal"><span class="pre">yafs.selection</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.distribution.html"><code class="docutils literal"><span class="pre">yafs.distribution</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.stats.html"><code class="docutils literal"><span class="pre">yafs.stats</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.metrics.html"><code class="docutils literal"><span class="pre">yafs.metrics</span></code></a></li>
-<li class="toctree-l2"><a class="reference internal" href="yafs.utils.html"><code class="docutils literal"><span class="pre">yafs.utils</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.html"><code class="docutils literal notranslate"><span class="pre">yafs</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.core.html"><code class="docutils literal notranslate"><span class="pre">yafs.core</span></code> — Simulator engine</a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.topology.html"><code class="docutils literal notranslate"><span class="pre">yafs.topology</span></code></a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#"><code class="docutils literal notranslate"><span class="pre">yafs.application</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#yafs.application.Application"><code class="docutils literal notranslate"><span class="pre">Application</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.TYPE_MODULE"><code class="docutils literal notranslate"><span class="pre">Application.TYPE_MODULE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.TYPE_SINK"><code class="docutils literal notranslate"><span class="pre">Application.TYPE_SINK</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.TYPE_SOURCE"><code class="docutils literal notranslate"><span class="pre">Application.TYPE_SOURCE</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.add_service_module"><code class="docutils literal notranslate"><span class="pre">Application.add_service_module()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.add_service_source"><code class="docutils literal notranslate"><span class="pre">Application.add_service_source()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.add_source_messages"><code class="docutils literal notranslate"><span class="pre">Application.add_source_messages()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.get_message"><code class="docutils literal notranslate"><span class="pre">Application.get_message()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.get_pure_modules"><code class="docutils literal notranslate"><span class="pre">Application.get_pure_modules()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.get_sink_modules"><code class="docutils literal notranslate"><span class="pre">Application.get_sink_modules()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#yafs.application.Application.set_modules"><code class="docutils literal notranslate"><span class="pre">Application.set_modules()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#yafs.application.Message"><code class="docutils literal notranslate"><span class="pre">Message</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yafs.application.create_applications_from_json"><code class="docutils literal notranslate"><span class="pre">create_applications_from_json()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#yafs.application.fractional_selectivity"><code class="docutils literal notranslate"><span class="pre">fractional_selectivity()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.population.html"><code class="docutils literal notranslate"><span class="pre">yafs.population</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.placement.html"><code class="docutils literal notranslate"><span class="pre">yafs.placement</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.selection.html"><code class="docutils literal notranslate"><span class="pre">yafs.selection</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.distribution.html"><code class="docutils literal notranslate"><span class="pre">yafs.distribution</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.stats.html"><code class="docutils literal notranslate"><span class="pre">yafs.stats</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.metrics.html"><code class="docutils literal notranslate"><span class="pre">yafs.metrics</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="yafs.path_routing.html"><code class="docutils literal notranslate"><span class="pre">yafs.path_routing</span></code></a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../about/index.html">ABOUT</a></li>
 </ul>
-<div class="relations">
-<h3>Related Topics</h3>
-<ul>
-  <li><a href="../contents.html">Documentation overview</a><ul>
-  <li><a href="index.html">API REFERENCE</a><ul>
-      <li>Previous: <a href="yafs.topology.html" title="previous chapter"><code class="docutils literal"><span class="pre">yafs.topology</span></code></a></li>
-      <li>Next: <a href="yafs.population.html" title="next chapter"><code class="docutils literal"><span class="pre">yafs.population</span></code></a></li>
-  </ul></li>
-  </ul></li>
-</ul>
-</div>
-<div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
-    <form class="search" action="../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
-    </form>
-</div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+
         </div>
       </div>
-      <div class="clearer"></div>
-    </div>
-    <div class="footer">
-      &copy;2017, Isaac Lera, Carlos Guerrero.
-      
-      |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
-      
-      |
-      <a href="../_sources/api_reference/yafs.application.rst.txt"
-          rel="nofollow">Page source</a>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../contents.html">YAFS</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../contents.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API REFERENCE</a></li>
+      <li class="breadcrumb-item active"><code class="docutils literal notranslate"><span class="pre">yafs.application</span></code></li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api_reference/yafs.application.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-yafs.application">
+<span id="yafs-application"></span><h1><code class="docutils literal notranslate"><span class="pre">yafs.application</span></code><a class="headerlink" href="#module-yafs.application" title="Link to this heading"></a></h1>
+<dl class="py class">
+<dt class="sig sig-object py" id="yafs.application.Application">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafs.application.</span></span><span class="sig-name descname"><span class="pre">Application</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application" title="Link to this definition"></a></dt>
+<dd><p>An application is defined by a DAG between modules that generate, compute and receive messages.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>name (str): The name must be unique within the same topology.</p>
+</dd>
+<dt>Returns:</dt><dd><p>an application</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yafs.application.Application.TYPE_MODULE">
+<span class="sig-name descname"><span class="pre">TYPE_MODULE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'MODULE'</span></em><a class="headerlink" href="#yafs.application.Application.TYPE_MODULE" title="Link to this definition"></a></dt>
+<dd><p>A module</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yafs.application.Application.TYPE_SINK">
+<span class="sig-name descname"><span class="pre">TYPE_SINK</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SINK'</span></em><a class="headerlink" href="#yafs.application.Application.TYPE_SINK" title="Link to this definition"></a></dt>
+<dd><p>A sink is like actuator</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="yafs.application.Application.TYPE_SOURCE">
+<span class="sig-name descname"><span class="pre">TYPE_SOURCE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SOURCE'</span></em><a class="headerlink" href="#yafs.application.Application.TYPE_SOURCE" title="Link to this definition"></a></dt>
+<dd><p>A source is like sensor</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.add_service_module">
+<span class="sig-name descname"><span class="pre">add_service_module</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_in</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message_out</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">param</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_service_module"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.add_service_module" title="Link to this definition"></a></dt>
+<dd><p>Link to each non-pure module a management of transfering of messages</p>
+<dl>
+<dt>Args:</dt><dd><p>module_name (str): module name</p>
+<p>message_in (Message): input message</p>
+<p>message_out (Message): output message. If Empty the module is a sink</p>
+<p>distribution (function): a function with a distribution function</p>
+<p>module_dest (list): a list of modules who can receive this message. Broadcasting.</p>
+<p>p (list): a list of probabilities to send this message. Broadcasting</p>
+</dd>
+<dt>Kwargs:</dt><dd><p>param (dict): the parameters for <em>distribution</em> function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.add_service_source">
+<span class="sig-name descname"><span class="pre">add_service_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">module_name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">distribution</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">message</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">module_dest</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">p</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">[]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_service_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.add_service_source" title="Link to this definition"></a></dt>
+<dd><p>Link to each non-pure module a management for creating messages</p>
+<dl>
+<dt>Args:</dt><dd><p>module_name (str): module name</p>
+<p>distribution (function): a function with a distribution function</p>
+<p>message (Message): the message</p>
+<p>module_dest (list): a list of modules who can receive this message. Broadcasting.</p>
+<p>p (list): a list of probabilities to send this message. Broadcasting</p>
+</dd>
+<dt>Kwargs:</dt><dd><p>param_distribution (dict): the parameters for <em>distribution</em> function</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.add_source_messages">
+<span class="sig-name descname"><span class="pre">add_source_messages</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">msg</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.add_source_messages"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.add_source_messages" title="Link to this definition"></a></dt>
+<dd><p>Add in the application those messages that come from pure sources (sensors). This distinction allows them to be controlled by the (<code class="xref py py-mod docutils literal notranslate"><span class="pre">Population</span></code>) algorithm</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.get_message">
+<span class="sig-name descname"><span class="pre">get_message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.get_message" title="Link to this definition"></a></dt>
+<dd><p>Returns: a message instance from the identifier name</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.get_pure_modules">
+<span class="sig-name descname"><span class="pre">get_pure_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_pure_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.get_pure_modules" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>a list of pure source and sink modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.get_sink_modules">
+<span class="sig-name descname"><span class="pre">get_sink_modules</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.get_sink_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.get_sink_modules" title="Link to this definition"></a></dt>
+<dd><dl class="simple">
+<dt>Returns:</dt><dd><p>a list of sink modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="yafs.application.Application.set_modules">
+<span class="sig-name descname"><span class="pre">set_modules</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Application.set_modules"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Application.set_modules" title="Link to this definition"></a></dt>
+<dd><p>Pure source or sink modules must be typified</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data (dict) : a set of characteristic of modules</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="yafs.application.Message">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">yafs.application.</span></span><span class="sig-name descname"><span class="pre">Message</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">name</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">src</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dst</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instructions</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">bytes</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">broadcasting</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#Message"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.Message" title="Link to this definition"></a></dt>
+<dd><p>A message is set by the following values:</p>
+<dl>
+<dt>Args:</dt><dd><p>name (str): a name, unique for each application</p>
+<p>src (str): the name of module who send this message</p>
+<p>dst (dst): the nsame of module who receive this message</p>
+<p>inst (int): the number of instructions to be executed ((by default 0), Instead of MIPS, we use IPt since the time is relative to the simulation units.</p>
+<p>bytes (int): the size in bytes (by default 0)</p>
+</dd>
+<dt>Internal args used in the <strong>yafs.core</strong> are:</dt><dd><p>timestamp (float): simulation time. Instant of time that was created.</p>
+<p>path (list): a list of entities of the topology that has to travel to reach its target module from its source module.</p>
+<p>dst_int (int): an identifier of the intermediate entity in which it is in the process of transmission.</p>
+<p>app_name (str): the name of the application</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yafs.application.create_applications_from_json">
+<span class="sig-prename descclassname"><span class="pre">yafs.application.</span></span><span class="sig-name descname"><span class="pre">create_applications_from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#create_applications_from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.create_applications_from_json" title="Link to this definition"></a></dt>
+<dd><p>Creates application objects from JSON data.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>data (list): A list of dictionaries representing application data in JSON format.</p>
+</dd>
+<dt>Returns:</dt><dd><p>dict: A dictionary containing application objects, where keys are application names and values are Application objects.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="yafs.application.fractional_selectivity">
+<span class="sig-prename descclassname"><span class="pre">yafs.application.</span></span><span class="sig-name descname"><span class="pre">fractional_selectivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">threshold</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/yafs/application.html#fractional_selectivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#yafs.application.fractional_selectivity" title="Link to this definition"></a></dt>
+<dd><p>Determines whether an event should occur based on a fractional selectivity.</p>
+<dl class="simple">
+<dt>Args:</dt><dd><p>threshold (float): The threshold value for selectivity. Should be in the range [0, 1].</p>
+</dd>
+<dt>Returns:</dt><dd><p>bool: True if the event should occur based on the given threshold, False otherwise.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="yafs.topology.html" class="btn btn-neutral float-left" title="yafs.topology" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="yafs.population.html" class="btn btn-neutral float-right" title="yafs.population" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
-    
+  <hr/>
 
-    
-  </body>
+  <div role="contentinfo">
+    <p>&#169; Copyright 2017, Isaac Lera, Carlos Guerrero.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
 </html>

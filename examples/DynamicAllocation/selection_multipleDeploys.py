@@ -9,7 +9,23 @@ class CloudPath_RR(Selection):
         self.rr = {}  # for a each type of service, we have a mod-counter
 
     def get_path(self, sim, app_name, message, topology_src, alloc_DES, alloc_module, traffic, from_des):
+        """
+            Determines the path for a message using the Round Robin (RR) algorithm.
 
+            Parameters:
+              sim: Simulation environment.
+              app_name: Name of the application.
+              message: Message object containing information like destination.
+              topology_src: Source node in the network.
+              alloc_DES: Mapping of modules to devices.
+              alloc_module: Allocation of modules to services.
+              traffic: Traffic information.
+              from_des: Source device.
+
+            Returns:
+              bestPath: Best path for the message.
+              bestDES: Best destination entity.
+        """
         node_src = topology_src
         DES_dst = alloc_module[app_name][message.dst]  # returns an array with all DES process serving
 
@@ -41,6 +57,16 @@ class BroadPath(Selection):
     def compute_most_near(self,node_src,alloc_DES,sim,DES_dst):
         """
         This functions caches the minimun path among client-devices and fog-devices-Module Calculator and it chooses the best calculator process deployed in that node
+
+        Parameters:
+          node_src: Source node in the network.
+          alloc_DES: Mapping of modules to devices.
+          sim: Simulation environment.
+          DES_dst: Destination entities.
+
+        Returns:
+          minPath: Minimum path.
+          bestDES: the Best destination entity.
         """
         #By Placement policy we know that:
 
@@ -60,6 +86,20 @@ class BroadPath(Selection):
     def get_path(self, sim, app_name, message, topology_src, alloc_DES, alloc_module, traffic, from_des):
         """
         Get the path between a node of the topology and a module deployed in a node. Furthermore it chooses the process deployed in that node.
+
+        Parameters:
+          sim: Simulation environment.
+          app_name: Name of the application.
+          message: Message object containing information like destination.
+          topology_src: Source node in the network.
+          alloc_DES: Mapping of modules to devices.
+          alloc_module: Allocation of modules to services.
+          traffic: Traffic information.
+          from_des: Source device.
+
+        Returns:
+          path: Path for the message.
+          des: Destination entity.
 
         """
         node_src = topology_src  # TOPOLOGY SOURCE where the message is generated

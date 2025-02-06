@@ -5,6 +5,18 @@ import random
 
 
 class Evolutive(Population):
+    """
+            Represents an evolutive population strategy for deployment.
+
+            Parameters:
+              fog: List of fog devices available for deployment.
+              srcs: Number of source generators to deploy.
+              **kwargs: Additional keyword arguments.
+
+            Attributes:
+              fog_devices: Available fog devices for deployment.
+              number_generators: Number of source generators.
+    """
 
     def __init__(self,fog,srcs, **kwargs):
        #TODO arreglar en otros casos
@@ -13,6 +25,18 @@ class Evolutive(Population):
         super(Evolutive, self).__init__(**kwargs)
 
     def initial_allocation(self, sim, app_name):
+
+        """
+                Initializes the allocation of sources and sinks for the evolutive strategy.
+
+                Parameters:
+                  sim: The simulation environment.
+                  app_name: Name of the application.
+
+                Note:
+                  This method deploys source generators and the first sink based on the evolutive strategy.
+        """
+
         #ASSIGNAMENT of SOURCE - GENERATORS - ACTUATORS
         id_nodes = list(sim.topology.G.nodes())
         for ctrl in self.src_control:
@@ -33,10 +57,20 @@ class Evolutive(Population):
 
 
     def run(self, sim):
+        """
+                Runs the evolutive strategy to deploy new actuators.
+
+                Parameters:
+                  sim: The simulation environment.
+
+                Note:
+                  This method deploys a new actuator based on the evolutive strategy.
+        """
         if len(self.fog_devices)>0:
             fog_device = self.fog_devices[0][0]
             del self.fog_devices[0]
-            self.logger.debug("Activiting - RUN - Evolutive - Deploying a new actuator at position: %i"%fog_device)
+            self.logger.debug("Activiting - RUN - Evolutive - Deploying"
+                              " a new actuator at position: %i"%fog_device)
             for ctrl in self.sink_control:
                 module = ctrl["module"]
                 app_name = ctrl["app"]
@@ -45,12 +79,31 @@ class Evolutive(Population):
 
 
 class Statical(Population):
+    """
+            Represents a statical population strategy for deployment.
 
+            Parameters:
+              srcs: Number of source generators to deploy.
+              **kwargs: Additional keyword arguments.
+
+            Attributes:
+              number_generators: Number of source generators.
+    """
     def __init__(self,srcs,**kwargs):
         self.number_generators = srcs
         super(Statical, self).__init__(**kwargs)
 
     def initial_allocation(self, sim, app_name):
+        """
+                Initializes the allocation of sources and sinks for the statical strategy.
+
+                Parameters:
+                  sim: The simulation environment.
+                  app_name: Name of the application.
+
+                Note:
+                  This method deploys source generators and sinks based on the statical strategy.
+        """
         #ASSIGNAMENT of SOURCE - GENERATORS - ACTUATORS
         id_nodes = list(sim.topology.G.nodes())
         for ctrl in self.src_control:

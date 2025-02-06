@@ -22,4 +22,4 @@ components.
    yafs.distribution
    yafs.stats
    yafs.metrics
-   yafs.utils
+   yafs.path_routing

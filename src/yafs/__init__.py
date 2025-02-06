@@ -16,6 +16,8 @@ from yafs.population import Population,Statical
 from yafs.application import Application, Message
 from yafs.metrics import Metrics
 from yafs.distribution import *
+from yafs import path_routing
+from yafs import stats
 
 def compile_toc(entries, section_marker='='):
     """Compiles a list of sections with objects into sphinx formatted
@@ -39,7 +41,10 @@ toc = (
     ('Placement', [Placement,ClusterPlacement]),
     ('Selection', [Selection,OneRandomPath,First_ShortestPath]),
     ('Metrics', [Metrics]),
-    ('Distribution',[Distribution,deterministic_distribution,exponential_distribution])
+    ('Distribution',[Distribution,deterministic_distribution,exponential_distribution]),
+    ('path_routing'),
+    ('stats')
+    
 )
 
 

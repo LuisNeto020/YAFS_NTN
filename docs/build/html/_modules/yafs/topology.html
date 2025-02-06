@@ -1,41 +1,32 @@
+<!DOCTYPE html>
 
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
-<html xmlns="http://www.w3.org/1999/xhtml">
+<html lang="en" data-content_root="../../">
   <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>yafs.topology &#8212; YAFS 0.3 documentation</title>
-    <link rel="stylesheet" href="../../_static/alabaster.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
-    <script type="text/javascript">
-      var DOCUMENTATION_OPTIONS = {
-        URL_ROOT:    '../../',
-        VERSION:     '0.3',
-        COLLAPSE_INDEX: false,
-        FILE_SUFFIX: '.html',
-        HAS_SOURCE:  true,
-        SOURCELINK_SUFFIX: '.txt'
-      };
-    </script>
-    <script type="text/javascript" src="../../_static/jquery.js"></script>
-    <script type="text/javascript" src="../../_static/underscore.js"></script>
-    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=fa44fd50" />
+    <link rel="stylesheet" type="text/css" href="../../_static/alabaster.css?v=12dfc556" />
+    <script src="../../_static/documentation_options.js?v=b489f392"></script>
+    <script src="../../_static/doctools.js?v=888ff710"></script>
+    <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" />
    
   <link rel="stylesheet" href="../../_static/custom.css" type="text/css" />
   
-  
-  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
 
-  </head>
-  <body>
+  
+  
+
+  </head><body>
   
 
     <div class="document">
       <div class="documentwrapper">
         <div class="bodywrapper">
+          
+
           <div class="body" role="main">
             
   <h1>Source code for yafs.topology</h1><div class="highlight"><pre>
@@ -44,12 +35,13 @@
 
 
 <span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 
 
-<div class="viewcode-block" id="Topology"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology">[docs]</a><span class="k">class</span> <span class="nc">Topology</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Topology">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology">[docs]</a>
+<span class="k">class</span> <span class="nc">Topology</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class unifies the functions to deal with **Complex Networks** as a network topology within of the simulator. In addition, it facilitates its creation, and assignment of attributes.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -67,24 +59,11 @@
 
 
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logger</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">__idNode</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
         <span class="c1"># G is a nx.networkx graph</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="kc">None</span>
-
-
-        <span class="c1"># TODO VERSION 2. THIS VALUE SHOULD BE REMOVED</span>
-        <span class="c1"># INSTEAD USE NX.G. attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span> <span class="o">=</span> <span class="p">{}</span>
-
-
-        <span class="c1"># A simple *cache* to have all cloud  nodes</span>
-        <span class="c1"># TODO VERSION 2. THIS VALUE SHOULD BE REMOVED</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">cloudNodes</span> <span class="o">=</span> <span class="p">[]</span>
-
-
-
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
@@ -94,15 +73,20 @@
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="s2">&quot;uptime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-<div class="viewcode-block" id="Topology.get_edges"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_edges">[docs]</a>    <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Topology.get_edges">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_edges">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_edges</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            list: a list of graph edges, i.e.: ((1,0),(0,2),...)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span></div>
 
-<div class="viewcode-block" id="Topology.get_edge"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_edge">[docs]</a>    <span class="k">def</span> <span class="nf">get_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.get_edge">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_edge">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_edge</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            key (str): a edge identifier, i.e. (1,9)</span>
 
@@ -111,15 +95,21 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">edges</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="Topology.get_nodes"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_nodes">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.get_nodes">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_nodes">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_nodes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            list: a list of all nodes features</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span></div>
 
-<div class="viewcode-block" id="Topology.get_node"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_node">[docs]</a>    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.get_node">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_node">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Args:</span>
 <span class="sd">            key (int): a node identifier</span>
 
@@ -129,11 +119,17 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
 
-<div class="viewcode-block" id="Topology.get_info"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_info">[docs]</a>    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Topology.get_info">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_info">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_info</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span></div>
 
-<div class="viewcode-block" id="Topology.create_topology_from_graph"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.create_topology_from_graph">[docs]</a>    <span class="k">def</span> <span class="nf">create_topology_from_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.create_topology_from_graph">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.create_topology_from_graph">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_topology_from_graph</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">G</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        It generates the topology from a NetworkX graph</span>
 
 <span class="sd">        Args:</span>
@@ -141,12 +137,14 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">nx</span><span class="o">.</span><span class="n">classes</span><span class="o">.</span><span class="n">graph</span><span class="o">.</span><span class="n">Graph</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">G</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__idNode</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span></div>
 
-<div class="viewcode-block" id="Topology.create_random_topology"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.create_random_topology">[docs]</a>    <span class="k">def</span> <span class="nf">create_random_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxGraphGenerator</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.create_random_topology">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.create_random_topology">[docs]</a>
+    <span class="k">def</span> <span class="nf">create_random_topology</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nxGraphGenerator</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        It generates the topology from a Graph generators of NetworkX</span>
 
 <span class="sd">        Args:</span>
@@ -157,12 +155,18 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">nxGraphGenerator</span><span class="p">(</span><span class="o">*</span><span class="n">params</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">__idNode</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">node</span><span class="p">)</span>
         <span class="k">except</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">Exception</span></div>
 
-<div class="viewcode-block" id="Topology.load"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.load">[docs]</a>    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.load">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.load">[docs]</a>
+    <span class="k">def</span> <span class="nf">load</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">):</span>
+        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The load function will merged with load_all_node_attr function&quot;</span><span class="p">,</span>
+                      <span class="ne">FutureWarning</span><span class="p">,</span>
+                      <span class="n">stacklevel</span><span class="o">=</span><span class="mi">8</span>
+                      <span class="p">)</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">            It generates the topology from a JSON file</span>
 <span class="sd">            see project example: Tutorial_JSONModelling</span>
 
@@ -182,26 +186,37 @@
         <span class="c1"># Correct way to use custom and mandatory topology attributes</span>
 
         <span class="n">valuesIPT</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="n">valuesRAM</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># valuesRAM = {}</span>
         <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;entity&quot;</span><span class="p">]:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="n">valuesIPT</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;IPT&quot;</span><span class="p">]</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
                 <span class="n">valuesIPT</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">valuesRAM</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;RAM&quot;</span><span class="p">]</span>
-            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                <span class="n">valuesRAM</span><span class="p">[</span><span class="n">node</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="c1"># try:</span>
+            <span class="c1">#     valuesRAM[node[&quot;id&quot;]] = node[&quot;RAM&quot;]</span>
+            <span class="c1"># except KeyError:</span>
+            <span class="c1">#     valuesRAM[node[&quot;id&quot;]] = 0</span>
 
 
         <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="n">valuesIPT</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;IPT&quot;</span><span class="p">)</span>
-        <span class="n">nx</span><span class="o">.</span><span class="n">set_node_attributes</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span><span class="n">values</span><span class="o">=</span><span class="n">valuesRAM</span><span class="p">,</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;RAM&quot;</span><span class="p">)</span>
+        <span class="c1"># nx.set_node_attributes(self.G,values=valuesRAM,name=&quot;RAM&quot;)</span>
 
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">__idNode</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">__init_uptimes</span><span class="p">()</span></div>
 
-<div class="viewcode-block" id="Topology.load_all_node_attr"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.load_all_node_attr">[docs]</a>    <span class="k">def</span> <span class="nf">load_all_node_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Topology.load_all_node_attr">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.load_all_node_attr">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_all_node_attr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">data</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">            Loads all node attributes and creates the topology from the provided data.</span>
+<span class="sd">            This function loads all node attributes from the provided data and creates the network topology accordingly.</span>
+
+<span class="sd">            Args:</span>
+<span class="sd">                data (dict): A dictionary containing information about nodes and links in the topology.</span>
+
+<span class="sd">            Returns:</span>
+<span class="sd">                None</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">edge</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;link&quot;</span><span class="p">]:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">edge</span><span class="p">[</span><span class="s2">&quot;s&quot;</span><span class="p">],</span> <span class="n">edge</span><span class="p">[</span><span class="s2">&quot;d&quot;</span><span class="p">],</span> <span class="n">BW</span><span class="o">=</span><span class="n">edge</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">LINK_BW</span><span class="p">],</span> <span class="n">PR</span><span class="o">=</span><span class="n">edge</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">LINK_PR</span><span class="p">])</span>
@@ -222,7 +237,10 @@
 
 
 
-<div class="viewcode-block" id="Topology.load_graphml"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.load_graphml">[docs]</a>    <span class="k">def</span> <span class="nf">load_graphml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
+
+<div class="viewcode-block" id="Topology.load_graphml">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.load_graphml">[docs]</a>
+    <span class="k">def</span> <span class="nf">load_graphml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">filename</span><span class="p">):</span>
         <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The load_graphml function is deprecated and &quot;</span>
                       <span class="s2">&quot;will be removed in version 2.0.0. &quot;</span>
                       <span class="s2">&quot;Use NX.READ_GRAPHML function instead.&quot;</span><span class="p">,</span>
@@ -243,15 +261,21 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">node</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="c1">#it has &quot;id&quot; att. TODO IMPROVE</span></div>
 
 
-<div class="viewcode-block" id="Topology.get_nodes_att"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.get_nodes_att">[docs]</a>    <span class="k">def</span> <span class="nf">get_nodes_att</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.get_nodes_att">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.get_nodes_att">[docs]</a>
+    <span class="k">def</span> <span class="nf">get_nodes_att</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            A dictionary with the features of the nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span></div>
 
-<div class="viewcode-block" id="Topology.find_IDs"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.find_IDs">[docs]</a>    <span class="k">def</span> <span class="nf">find_IDs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.find_IDs">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.find_IDs">[docs]</a>
+    <span class="k">def</span> <span class="nf">find_IDs</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">value</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Search for nodes with the same attributes that value</span>
 
 <span class="sd">        Args:</span>
@@ -260,7 +284,7 @@
 <span class="sd">        Returns:</span>
 <span class="sd">            A list with the ID of each node that have the same attribute that the value.value</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">keyS</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">keyS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">value</span><span class="o">.</span><span class="n">keys</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
 
         <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">nodeAttributes</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
@@ -271,15 +295,21 @@
         <span class="k">return</span> <span class="n">result</span></div>
 
 
-<div class="viewcode-block" id="Topology.size"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.size">[docs]</a>    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.size">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.size">[docs]</a>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns:</span>
 <span class="sd">            an int with the number of nodes</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Topology.add_node"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.add_node">[docs]</a>    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.add_node">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.add_node">[docs]</a>
+    <span class="k">def</span> <span class="nf">add_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nodes</span><span class="p">,</span> <span class="n">edges</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Add a list of nodes in the topology</span>
 
 <span class="sd">        Args:</span>
@@ -293,8 +323,11 @@
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">__idNode</span></div>
 
-<div class="viewcode-block" id="Topology.remove_node"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.remove_node">[docs]</a>    <span class="k">def</span> <span class="nf">remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_node</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="Topology.remove_node">
+<a class="viewcode-back" href="../../api_reference/yafs.topology.html#yafs.topology.Topology.remove_node">[docs]</a>
+    <span class="k">def</span> <span class="nf">remove_node</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">id_node</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Remove a node of the topology</span>
 
 <span class="sd">        Args:</span>
@@ -303,27 +336,19 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="o">.</span><span class="n">remove_node</span><span class="p">(</span><span class="n">id_node</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">()</span></div>
+</div>
 
 
-<div class="viewcode-block" id="Topology.write"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path</span><span class="p">):</span>
-        <span class="n">nx</span><span class="o">.</span><span class="n">write_gexf</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
-
-<div class="viewcode-block" id="Topology.draw_png"><a class="viewcode-back" href="../../api_reference/yafs.html#yafs.topology.Topology.draw_png">[docs]</a>    <span class="k">def</span> <span class="nf">draw_png</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">path_file</span><span class="p">):</span>
-        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="n">nrows</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncols</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
-        <span class="n">pos</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">spring_layout</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">)</span>
-        <span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
-        <span class="n">labels</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">draw_networkx_labels</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">G</span><span class="p">,</span> <span class="n">pos</span><span class="p">)</span>
-        <span class="n">fig</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">path_file</span><span class="p">)</span>  <span class="c1"># save the figure to file</span>
-        <span class="n">plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">fig</span><span class="p">)</span>  <span class="c1"># close the figure</span></div></div>
 </pre></div>
 
           </div>
+          
         </div>
       </div>
       <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
         <div class="sphinxsidebarwrapper">
-<h3><a href="../../contents.html">Table Of Contents</a></h3>
+<h3><a href="../../contents.html">Table of Contents</a></h3>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">OVERVIEW</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html#acknowledge">Acknowledge</a></li>
@@ -343,25 +368,25 @@
 </ul>
 </div>
 <div id="searchbox" style="display: none" role="search">
-  <h3>Quick search</h3>
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
     <form class="search" action="../../search.html" method="get">
-      <div><input type="text" name="q" /></div>
-      <div><input type="submit" value="Go" /></div>
-      <input type="hidden" name="check_keywords" value="yes" />
-      <input type="hidden" name="area" value="default" />
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
     </form>
+    </div>
 </div>
-<script type="text/javascript">$('#searchbox').show(0);</script>
+<script>document.getElementById('searchbox').style.display = "block"</script>
         </div>
       </div>
       <div class="clearer"></div>
     </div>
     <div class="footer">
-      &copy;2017, Isaac Lera, Carlos Guerrero.
+      &#169;2017, Isaac Lera, Carlos Guerrero.
       
       |
-      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.6.3</a>
-      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.2.6</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
       
     </div>
 

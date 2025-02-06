@@ -6,7 +6,21 @@ import logging
 
 class DynamicPopulation(Population):
     """
-    We launch one user by invocation
+    Represents a dynamic population strategy where users are launched based on an invocation sequence.
+
+    Attributes:
+      data: Data containing information about user invocations.
+      it: Iteration number for simulation repetitions.
+      userOrderInputByInvocation: Sequence of user invocations.
+      logger: Logger instance for logging messages.
+
+    Parameters:
+      data: Data containing information about user invocations.
+      iteration: Iteration number for simulation repetitions.
+      logger: Logger instance for logging messages. If not provided, a new logger will be created.
+
+    Note:
+      This population strategy launches one user per invocation based on a predefined sequence.
     """
     def __init__(self, data, iteration,logger=None,**kwargs):
         super(DynamicPopulation, self).__init__(**kwargs)

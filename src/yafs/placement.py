@@ -66,6 +66,18 @@ class Placement(object):
         self.logger.debug("Activiting - RUN - Placement")
 
 class JSONPlacement(Placement):
+    """
+        A placement algorithm based on JSON data.
+
+        This algorithm reads placement data from a JSON file and deploys modules accordingly.
+
+        Args:
+            json (dict): The JSON data containing placement information.
+
+        Kwargs:
+            kwargs: Additional keyword arguments.
+
+    """
     def __init__(self, json, **kwargs):
         super(JSONPlacement, self).__init__(**kwargs)
         self.data = json
@@ -82,6 +94,19 @@ class JSONPlacement(Placement):
 
 
 class JSONPlacementOnCloud(Placement):
+    """
+        A placement algorithm for deploying modules on a specific cloud.
+
+        This algorithm reads placement data from a JSON file and deploys modules on the specified cloud.
+
+        Args:
+            json (dict): The JSON data containing placement information.
+            idCloud (str): The ID of the cloud where modules will be deployed.
+
+        Kwargs:
+            kwargs: Additional keyword arguments.
+
+    """
     def __init__(self, json,idCloud, **kwargs):
         super(JSONPlacementOnCloud, self).__init__(**kwargs)
         self.data = json

@@ -250,7 +250,7 @@ class Sim:
                 else:
                     src_int = message.dst_int
                     message.dst_int = message.path[message.path.index(message.dst_int) + 1]
-                # arista set by (src_int,message.dst_int)
+                # Edge set by (src_int,message.dst_int)
                 link = (src_int, message.dst_int)
 
 

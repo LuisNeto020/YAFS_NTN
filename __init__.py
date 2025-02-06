@@ -7,9 +7,16 @@ The following tables list all of the available components in this module.
 
 """
 from pkgutil import extend_path
-
-from DynamicWorkload import Evolutive_population
-from DynamicWorkload import selection_multipleDeploys
+import simpy
+from yafs.core import Sim
+from yafs.placement import Placement,ClusterPlacement
+from yafs.selection import Selection,OneRandomPath,First_ShortestPath
+from yafs.topology import Topology
+from yafs.population import Population,Statical
+from yafs.application import Application, Message
+from yafs.metrics import Metrics
+from yafs.distribution import *
+import yafs.utils
 
 def compile_toc(entries, section_marker='='):
     """Compiles a list of sections with objects into sphinx formatted
@@ -26,9 +33,14 @@ def compile_toc(entries, section_marker='='):
 
 
 toc = (
-    ('Evolutive_population'),
-    ('selection_multipleDeploys'),
-    
+    ('Core', [Sim]),
+    ('Topology', [Topology]),
+    ('Application', [Application, Message]),
+    ('Population', [Population, Statical]),
+    ('Placement', [Placement,ClusterPlacement]),
+    ('Selection', [Selection,OneRandomPath,First_ShortestPath]),
+    ('Metrics', [Metrics]),
+    ('Distribution', [Distribution, deterministic_distribution, exponential_distribution])
 )
 
 
@@ -39,4 +51,4 @@ if __doc__:
 __all__ = [obj.__name__ for section, objs in toc for obj in objs]
 
 __path__ = extend_path(__path__, __name__)
-__version__ = '0.1'
+__version__ = '0.2'

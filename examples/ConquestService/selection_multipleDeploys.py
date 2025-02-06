@@ -14,6 +14,20 @@ class DeviceSpeedAwareRouting(Selection):
         super(DeviceSpeedAwareRouting, self).__init__()
 
     def compute_BEST_DES(self, node_src, alloc_DES, sim, DES_dst,message):
+        """
+        Computes the best Destination Entity (DES) based on the network topology.
+
+        Args:
+            node_src (int): Source node.
+            alloc_DES (dict): Mapping of DES IDs to topology nodes.
+            sim (Sim): Simulation instance.
+            DES_dst (list): List of available DESs for the service.
+            message (Message): Message to be routed.
+
+        Returns:
+            minPath: The shortest path from the source to the destination.
+            bestDES: The best destination for the message.
+        """
         try:
 
             bestLong = float('inf')
@@ -40,6 +54,23 @@ class DeviceSpeedAwareRouting(Selection):
             return [], None
 
     def get_path(self, sim, app_name, message, topology_src, alloc_DES, alloc_module, traffic, from_des):
+        """
+        Obtains the ideal path for the message.
+
+        Args:
+            sim (Sim): Simulation instance.
+            app_name (str): Application name.
+            message (Message): Message to be routed.
+            topology_src (int): Source node.
+            alloc_DES (dict): Mapping of DES IDs to topology nodes.
+            alloc_module (dict): Mapping of modules to DES IDs.
+            traffic (obj): Network traffic.
+            from_des (int): Source DES ID.
+
+        Returns:
+            path: A list containing the path for the message.
+            des: A list containing the destination for the message.
+        """
         node_src = topology_src #entity that sends the message
 
         # Name of the service
@@ -63,6 +94,23 @@ class DeviceSpeedAwareRouting(Selection):
         return [path], [des]
 
     def get_path_from_failure(self, sim, message, link, alloc_DES, alloc_module, traffic, ctime, from_des):
+        """
+        Obtains the ideal path when a failure occurs.
+
+        Args:
+            sim (Sim): Simulation instance.
+            message (Message): Message to be routed.
+            link (tuple): Failed link.
+            alloc_DES (dict): Mapping of DES IDs to topology nodes.
+            alloc_module (dict): Mapping of modules to DES IDs.
+            traffic (obj): Network traffic.
+            ctime (int): Current simulation time.
+            from_des (int): Source DES ID.
+
+        Returns:
+            concPath: A list containing the new path for the message.
+            des: The destination for the message.
+        """
         # print("Example of enrouting")
         #print(message.path # [86, 242, 160, 164, 130, 301, 281, 216])
         #print(message.dst_int  # 301)

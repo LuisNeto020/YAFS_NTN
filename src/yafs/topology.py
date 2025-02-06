@@ -147,6 +147,16 @@ class Topology:
         self.__init_uptimes()
 
     def load_all_node_attr(self,data):
+        """
+            Loads all node attributes and creates the topology from the provided data.
+            This function loads all node attributes from the provided data and creates the network topology accordingly.
+
+            Args:
+                data (dict): A dictionary containing information about nodes and links in the topology.
+
+            Returns:
+                None
+        """
         self.G = nx.Graph()
         for edge in data["link"]:
             self.G.add_edge(edge["s"], edge["d"], BW=edge[self.LINK_BW], PR=edge[self.LINK_PR])

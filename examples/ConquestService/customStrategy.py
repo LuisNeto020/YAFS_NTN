@@ -3,7 +3,13 @@ import random
 import pickle
 
 class CustomStrategy():
+    """
+    A custom strategy for dynamic deployment of services based on the Fog Application Placement Problem (FAPP).
 
+    Attributes:
+        activations (int): The number of times the strategy has been activated.
+        pathResults (str): The path to store the results.
+    """
     def __init__(self,pathResults):
         self.activations = 0
         self.pathResults = pathResults
@@ -108,7 +114,7 @@ class CustomStrategy():
                         services_not_used[k].append(service)
 
 
-        print("-- Servicios no usados")
+        print("-- Services not used")
         print(services_not_used)
         print("-"*30)
 
