@@ -42,8 +42,8 @@ toc = (
     ('Selection', [Selection,OneRandomPath,First_ShortestPath]),
     ('Metrics', [Metrics]),
     ('Distribution',[Distribution,deterministic_distribution,exponential_distribution]),
-    ('path_routing'),
-    ('stats')
+    ('path_routing', []),
+    ('stats', [])
     
 )
 

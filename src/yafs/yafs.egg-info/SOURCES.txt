@@ -1,0 +1,5 @@
+setup.py
+yafs.egg-info/PKG-INFO
+yafs.egg-info/SOURCES.txt
+yafs.egg-info/dependency_links.txt
+yafs.egg-info/top_level.txt

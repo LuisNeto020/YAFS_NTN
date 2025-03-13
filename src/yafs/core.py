@@ -373,6 +373,20 @@ class Sim:
             self.logger.debug("(DES:%i) %7.4f Run - Population Policy: %s " % (myId, self.env.now, self.stop))  # REWRITE
             population.run(self)
         self.logger.debug("STOP_Process - Population Algorithm\t#DES:%i" % myId)
+        
+    def __add_user_mobility_process(self, user_mobility):
+        """
+        A DES-process who controls the invocation of UserMobility.run
+        """
+        myId = self.__get_id_process()
+        self.des_process_running[myId] = True
+        self.des_control_process['user_mobility'] = myId
+        
+        self.logger.debug("Added_Process - User Mobility\t#DES:%i" % myId)
+        while not self.stop and self.des_process_running[myId]:
+            yield self.env.timeout(user_mobility.get_next_activation())
+            user_mobility.run()
+        self.logger.debug("STOP_Process - User Mobility\t#DES:%i" % myId)
 
     def __getIDMessage(self):
         self.__idMessage +=1
@@ -958,6 +972,8 @@ class Sim:
         # Add Selection control to the App
         self.selector_path[app.name] = selector
 
+    def deploy_user_mobility(self, user_mobility):
+        self.env.process(self.__add_user_mobility_process(user_mobility))
 
     def get_alloc_entities(self):
         """ It returns a dictionary of deployed services
