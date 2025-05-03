@@ -161,6 +161,13 @@ class Sim:
         self.last_busy_time = {}  # must be updated with up/down nodes
         # This variable control the lag of each busy network links. It avoids the generation of a DES-process for each link
         # edge -> last_use_channel (float) = Simulation time
+        
+        self.mobile_users = []
+        self.there_are_users = False
+        
+        self.static_nodes = []
+        self.there_are_satellites = False
+        self.satellites_nodes = []
 
 
 
@@ -295,7 +302,7 @@ class Sim:
                     self.env.process(self.__wait_message(message, latency_msg_link, shift_time))
                 except:
                     #This fact is produced when a node or edge the topology is changed or disappeared
-                    self.logger.warning("The initial path assigned is unreachabled. Link: (%i,%i). Routing a new one. %i"%(link[0],link[1],self.env.now))
+                    self.logger.warning("The initial path assigned is unreachabled. Link: (%s,%s). Routing a new one. %i"%(link[0],link[1],self.env.now))
 
                     paths, DES_dst = self.selector_path[message.app_name].get_path_from_failure(self, message, link, self.alloc_DES,self.alloc_module, self.last_busy_time,self.env.now,from_des=message.idDES)
 
@@ -374,6 +381,20 @@ class Sim:
             population.run(self)
         self.logger.debug("STOP_Process - Population Algorithm\t#DES:%i" % myId)
         
+    def __add_satellite_mobility_process(self, satellite_mobility):
+        """
+        A DES-process who controls the invocation of SatelliteMobility.run
+        """
+        myId = self.__get_id_process()
+        self.des_process_running[myId] = True
+        self.des_control_process['satellite_mobility'] = myId
+        
+        self.logger.debug("Added_Process - Satellite Mobility\t#DES:%i" % myId)
+        while not self.stop and self.des_process_running[myId]:
+            yield self.env.timeout(satellite_mobility.get_next_activation())
+            satellite_mobility.run(self.env.now)
+        self.logger.debug("STOP_Process - User Mobility\t#DES:%i" % myId)
+        
     def __add_user_mobility_process(self, user_mobility):
         """
         A DES-process who controls the invocation of UserMobility.run
@@ -387,6 +408,20 @@ class Sim:
             yield self.env.timeout(user_mobility.get_next_activation())
             user_mobility.run()
         self.logger.debug("STOP_Process - User Mobility\t#DES:%i" % myId)
+        
+    def __add_coverage_process(self, coverage):
+        """
+        A DES-process who controls the invocation of coverage.run
+        """
+        myId = self.__get_id_process()
+        self.des_process_running[myId] = True
+        self.des_control_process['coverage'] = myId
+        
+        self.logger.debug("Added_Process - Coverage\t#DES:%i" % myId)
+        while not self.stop and self.des_process_running[myId]:
+            yield self.env.timeout(coverage.get_next_activation())
+            coverage.run()
+        self.logger.debug("STOP_Process - coverage\t#DES:%i" % myId)
 
     def __getIDMessage(self):
         self.__idMessage +=1
@@ -973,7 +1008,15 @@ class Sim:
         self.selector_path[app.name] = selector
 
     def deploy_user_mobility(self, user_mobility):
+        self.there_are_users = True
         self.env.process(self.__add_user_mobility_process(user_mobility))
+        
+    def deploy_satellite_mobility(self, satellite_mobility):
+        self.there_are_satellites = True
+        self.env.process(self.__add_satellite_mobility_process(satellite_mobility))
+        
+    def deploy_coverage(self, coverage):
+        self.env.process(self.__add_coverage_process(coverage))
 
     def get_alloc_entities(self):
         """ It returns a dictionary of deployed services
@@ -1148,6 +1191,11 @@ class Sim:
             until (int): Defines a stop time. If None the simulation runs until some internal algorithm changes the var *yafs.core.sim.stop* to True
         """
         self.env.process(self.__network_process())
+        
+        if self.there_are_users or self.there_are_satellites:
+            for node in self.topology.G.nodes:
+                if self.topology.G.nodes[node]["type"] == "STATIC":
+                    self.static_nodes.append(node)
 
         """
         Creating app.sources and deploy the sources in the topology

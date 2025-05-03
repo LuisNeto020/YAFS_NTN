@@ -1,0 +1,152 @@
+import math
+
+class Coverage(object):
+    def __init__(self, activation_dist, sim):
+        self.activation_dist = activation_dist
+        self.s = sim
+        self.user_connections = {}
+            
+        
+    def connectivity_policy(self, possible_conections, mobile_node):
+        None
+       
+    def verify_coverage_static_node(self, static_node, mobile_node):
+        None
+     
+    def verify_coverage_satellite_node(self, satellite_node, mobile_node):
+        None  
+           
+    def get_next_activation(self):
+        """
+        Returns:
+            the next time to be activated
+        """
+        return self.activation_dist.next() 
+    
+    def __add_connections(self, user, new_connections, current_connections):
+        for node in new_connections:
+            if node not in current_connections:
+                # Verificar se o nó e o usuário existem na topologia
+                if user in self.s.topology.G.nodes and node in self.s.topology.G.nodes:
+                    # Se a conexão ainda não existe, adicione a aresta na topologia
+                    self.s.topology.G.add_edge(node, user, BW=150, PR=0.07)
+                    print("ligação entre %s e %s", node, user)
+                    #app = self.s.apps["ats"]
+                    #services = app.services
+                    #self.s.deploy_module("ats", "Processing_Module", services["Processing_Module"],[node])
+                    self.user_connections.setdefault(user, []).append(node)
+    
+    def __remove_connections(self, user, new_connections, current_connections ):
+        for current_node in current_connections:
+            if current_node not in new_connections:
+                # Verificar se o nó e o usuário existem na topologia antes de remover a aresta
+                if user in self.s.topology.G.nodes and current_node in self.s.topology.G.nodes:
+                    # Remover a aresta da topologia
+                    self.s.topology.G.remove_edge(current_node, user)
+                    #self.s.undeploy_module("ats", "Processing_Module", current_node)
+                    # Remover o nó da lista de conexões do usuário
+                    self.user_connections[user].remove(current_node)
+                    # Se o usuário não tiver mais conexões, pode-se limpar a chave no dicionário
+                    if not self.user_connections[user]:
+                        del self.user_connections[user]
+    
+    def update_connection(self):
+        for user in self.s.mobile_users:
+            possible_conection = list()
+            for static in self.s.static_nodes:
+                if user in self.s.topology.G.nodes:
+                    if self.s.topology.G.nodes[static]["type"] == "STATIC":
+                        if self.verify_coverage_static_node(static, user):
+                            possible_conection.append(static)
+                    elif self.s.topology.G.nodes[static]["type"] == "SATELLITE":
+                        if self.verify_coverage_satellite_node(static, user):
+                            print("satellite node->>>>>", static) 
+                            possible_conection.append(static)
+            connections = self.connectivity_policy(possible_conection, user)
+                
+            # Obter as conexões atuais do usuário
+            current_connections = set(self.user_connections.get(user, []))
+
+            # Adicionar novas conexões
+            self.__add_connections(user, connections, current_connections)
+            # Remover conexões obsoletas
+            self.__remove_connections(user, connections, current_connections)
+            
+    def run(self):
+        """
+        
+        This method will be invoked during the simulation to change the assignment of the modules to the topology
+        Args:
+            sim (:mod: yafs.core.Sim)
+        """
+        
+        self.update_connection()
+        
+    
+class CircleCoverage(Coverage):
+    def __init__(self, activation_dist, sim, radius):
+        super().__init__(activation_dist, sim)
+        self.radius = radius  # Raio de cobertura em km
+    
+    def calculate_distance(self, node1, node2):
+        """
+        Calcula a distância geodésica entre dois nós usando a fórmula Haversine.
+        """
+        # Raio da Terra em km
+        R = 6371.0
+        
+        # Obtendo as coordenadas (latitude, longitude) dos nós
+        lat1, lon1 = self.s.topology.G.nodes[node1]['pos']
+        lat2, lon2 = self.s.topology.G.nodes[node2]['pos']
+        
+        # Convertendo de graus para radianos
+        lat1 = math.radians(lat1)
+        lon1 = math.radians(lon1)
+        lat2 = math.radians(lat2)
+        lon2 = math.radians(lon2)
+        
+        # Diferenças entre latitudes e longitudes
+        dlat = lat2 - lat1
+        dlon = lon2 - lon1
+        
+        # Fórmula Haversine
+        a = math.sin(dlat / 2)**2 + math.cos(lat1) * math.cos(lat2) * math.sin(dlon / 2)**2
+        c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a))
+        
+        # Distância em km
+        distance = R * c
+        return distance
+    
+    def verify_coverage_static_node(self, static_node, mobile_node):
+        """
+        Verifica se a distância entre static_node e mobile_node é menor que o raio
+        """
+        distance = self.calculate_distance(static_node, mobile_node)
+        #print("distancias", distance)
+        return distance <= self.radius
+    
+    def verify_coverage_satellite_node(self, satellite_node, mobile_node):
+        """
+        Mesmo que para static_node
+        """
+        radius = self.s.topology.G.nodes[satellite_node].get("coverage_radius_km", 0)
+        distance = self.calculate_distance(satellite_node, mobile_node)
+        return distance <= radius
+    
+    def connectivity_policy(self, possible_connections, mobile_node):
+        """
+        Retorna o nó mais próximo entre os possíveis nós com cobertura
+        """
+        if not possible_connections:
+            return []
+        
+        # Encontrar o nó mais próximo
+        closest_node = None
+        min_distance = float('inf')
+        for node in possible_connections:
+            distance = self.calculate_distance(node, mobile_node)
+            if distance < min_distance:
+                min_distance = distance
+                closest_node = node
+        
+        return [closest_node] if closest_node else []
