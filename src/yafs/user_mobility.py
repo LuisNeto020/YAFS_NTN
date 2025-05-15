@@ -2,79 +2,91 @@ import pandas as pd
 from yafs.distribution import deterministicDistributionStartPoint
 
 class UserMobility:
-    def __init__(self, sim, csv_file):
+    """
+    UserMobility manages the dynamic placement of mobile users (e.g., vehicles) 
+    in the simulation topology over time using mobility data from a CSV file.
+
+    The CSV file can be generated with SUMO (Simulation of Urban MObility) or any other source,
+    as long as it includes the required columns with the exact names:
+        - 'timestep_time': Simulation time for each step.
+        - 'vehicle_id': Unique identifier of the vehicle.
+        - 'vehicle_x': X-coordinate of the vehicle's position.
+        - 'vehicle_y': Y-coordinate of the vehicle's position.
+
+    Attributes:
+        sim (Simulation): The simulation object containing the topology.
+        csv_file (str): Path to the CSV file with movement data.
+        ipt (float): Instructions per time unit (IPT) for the mobile nodes.
+        ram (int): RAM size to be assigned to the mobile nodes.
+    """
+    def __init__(self, sim, csv_file, ipt, ram):
         self.df = pd.read_csv(csv_file, delimiter=';')
         self.s = sim
         self.topology = sim.topology  
-        self.users = {}  # Dicionário para armazenar veículos e seus nós na topologia
-        self.users_des = {} 
+        self.users = {} #Mapping of vehicle IDs to node IDs in the topology
         self.timesteps = sorted(self.df['timestep_time'].unique())
-        self.num_timesteps = len(self.timesteps)
+        self.num_timesteps = len(self.timesteps) 
         self.current_timestep = 0
+        self.ipt=ipt
+        self.ram=ram
         
     def get_next_activation(self):
-        """Calcula o próximo tempo de ativação (timestep) para os veículos. 
-        Retorna o próximo timestep ou um valor de tempo aleatório baseado na distribuição."""
+        """
+        Determines the time interval until the next timestep activation.
+
+        Returns:
+            int or None: Time difference to the next timestep, or None if simulation has ended.
+        """
         if self.current_timestep == 0:
             self.current_timestep += 1
             return 0
         elif self.current_timestep < self.num_timesteps - 1:
-            # Incrementa o timestep para o próximo
             self.current_timestep += 1
             return self.timesteps[self.current_timestep] - self.timesteps[self.current_timestep - 1] 
         else:
-            # Se atingiu o último timestep, pode retornar None ou um valor que indique que a simulação terminou
             return None
 
     def update_pos(self, timestep):
-        """Atualiza ou adiciona veículos na topologia conforme o timestep."""
+        """
+        Updates the positions of the mobile nodes in the topology at a given timestep.
+
+        Args:
+            timestep (int): The timestep at which to update positions.
+
+        Effects:
+            - Adds new nodes to the topology if they appear in the current timestep.
+            - Removes nodes that are no longer present in the current timestep.
+            - Updates positions of existing nodes.
+        """
         current_data = self.df[self.df['timestep_time'] == timestep]
 
-        # Primeiro, verifique todos os veículos que estão na topologia
-        active_vehicles = set(current_data['vehicle_id'])
+        active_user_m = set(current_data['vehicle_id'])
         
-         # Remover nós de veículos que não estão no timestep atual
-        for vehicle_id in list(self.users.keys()):
-            if vehicle_id not in active_vehicles:
-                node_id = self.users.pop(vehicle_id)  # Remove o veículo do dicionário
+        # Remove outdated from the topology
+        for user_m_id in list(self.users.keys()):
+            if user_m_id not in active_user_m:
+                node_id = self.users.pop(user_m_id)  
                 self.s.mobile_users.remove(node_id)
-                #self.s.undeploy_module("ats", "Client_Module", node_id)
-                #self.users_des.pop(vehicle_id)
                 if node_id in self.topology.G.nodes:
-                    print("no removido",node_id)
                     edges_to_remove = list(self.s.topology.G.edges(node_id))
-                    # Remove todas as arestas
                     self.s.topology.G.remove_edges_from(edges_to_remove)
-                    self.topology.G.remove_node(node_id)  # Remove o nó da topologia
+                    self.topology.G.remove_node(node_id) 
 
-        
+        # Add or update current positions
         for _, row in current_data.iterrows():
-            vehicle_id = str(row['vehicle_id'])  # YAFS usa string como identificador de nó
-            vehicle_x = row['vehicle_y']
-            vehicle_y = row['vehicle_x']
+            user_m_id = str(row['vehicle_id'])  
+            user_x = row['vehicle_y']
+            user_y = row['vehicle_x']
 
-            if vehicle_id in self.users and self.users[vehicle_id] in self.topology.G.nodes:
-                # Atualiza a posição do veículo na topologia
-                self.topology.G.nodes[self.users[vehicle_id]]['pos'] = (vehicle_x, vehicle_y)
+            if user_m_id in self.users and self.users[user_m_id] in self.topology.G.nodes:
+                self.topology.G.nodes[self.users[user_m_id]]['pos'] = (user_x, user_y)
             else:
-                # Adiciona novo veículo na topologia
-                self.topology.G.add_node(vehicle_id, type="MOBILE", IPT= 500, RAM=1000)
-                self.s.mobile_users.append(vehicle_id)
-                self.topology.G.nodes[vehicle_id]['pos'] = (vehicle_x, vehicle_y)
-                #app = self.s.apps["ats"]
-                #msg = app.get_message("m-sensor")
-                #des = self.s.deploy_source("ats", id_node=vehicle_id, msg=msg,distribution=deterministicDistributionStartPoint(0.9999, 1, name="MessageDistri"))
-                #app = self.s.apps["ats"]
-                #services = app.services
-                #self.s.deploy_module("ats", "Client_Module", services["Client_Module"],[vehicle_id])
-                self.users[vehicle_id] = vehicle_id  # Mapeia o ID do veículo ao nó criado
-                #self.users_des[vehicle_id] = des
-
+                self.topology.G.add_node(user_m_id, type="MOBILE", IPT= self.ipt, RAM=self.ram)
+                self.s.mobile_users.append(user_m_id)
+                self.topology.G.nodes[user_m_id]['pos'] = (user_x, user_y)
+                self.users[user_m_id] = user_m_id 
+    
     def run(self):
         
         self.update_pos(self.timesteps[self.current_timestep - 1])
-        #for node, data in self.topology.G.nodes(data=True):
-        #    print(f"Nó: {node}")
-        #    print(f"Atributos: {data}")
-        #    print("-" * 30)
         print(f"Timestep {self.timesteps[self.current_timestep - 1]}: {self.s.mobile_users}")

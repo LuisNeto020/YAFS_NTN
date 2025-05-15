@@ -64,7 +64,7 @@ class Population(object):
 
         .. attention:: override required
         """
-        self.run()
+        self.run( sim)
 
     # override
     def run(self, sim):

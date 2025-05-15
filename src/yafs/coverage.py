@@ -1,11 +1,15 @@
 import math
+from skyfield.api import wgs84
 
 class Coverage(object):
-    def __init__(self, activation_dist, sim):
+    def __init__(self, activation_dist, sim, bw_ter=0, pr_ter=0, bw_sat=0, time_unit="s"):
         self.activation_dist = activation_dist
         self.s = sim
         self.user_connections = {}
-            
+        self.bw_ter = bw_ter
+        self.pr_ter = pr_ter
+        self.bw_sat = bw_sat
+        self.time_unit = time_unit
         
     def connectivity_policy(self, possible_conections, mobile_node):
         None
@@ -29,11 +33,39 @@ class Coverage(object):
                 # Verificar se o nó e o usuário existem na topologia
                 if user in self.s.topology.G.nodes and node in self.s.topology.G.nodes:
                     # Se a conexão ainda não existe, adicione a aresta na topologia
-                    self.s.topology.G.add_edge(node, user, BW=150, PR=0.07)
-                    print("ligação entre %s e %s", node, user)
-                    #app = self.s.apps["ats"]
-                    #services = app.services
-                    #self.s.deploy_module("ats", "Processing_Module", services["Processing_Module"],[node])
+                    if self.s.topology.G.nodes[node]["type"] == "SATELLITE":
+                        lat1, lon1 = self.s.topology.G.nodes[user]['pos']
+                        lat2, lon2 = self.s.topology.G.nodes[node]['sub_pos']
+                        bluffton = wgs84.latlon(lat1, lon1)
+                        
+                        satellite = wgs84.latlon(lat2, lon2, self.s.topology.G.nodes[node]['altitude']*1000)
+                        t = self.s.topology.G.nodes[node]['time']
+                        difference = satellite - bluffton
+                        
+                        topocentric = difference.at(t)
+                        
+                        _, _, distance =topocentric.altaz()
+                        
+                        distance_km = distance.km
+
+                        # Cálculo do PR: distância (km) / velocidade da luz (km/s)
+                        speed_of_light_kms = 299792.458
+                        pr_in_seconds = distance_km / speed_of_light_kms
+                        
+                        unit_factors = {
+                            's': 1,
+                            'ms': 1000,
+                            'm': 1/60,
+                            'h': 1/3600
+                        }
+                        pr = pr_in_seconds * unit_factors.get(self.time_unit, 1)
+                        
+                        self.s.topology.G.add_edge(node, user, BW=self.bw_sat, PR=pr)
+                        print("ligação entre %s e %s com pr %s", node, user, pr)
+                    else:
+                        self.s.topology.G.add_edge(node, user, BW=self.bw_ter, PR=self.pr_ter)
+                        print("ligação entre %s e %s", node, user)
+                
                     self.user_connections.setdefault(user, []).append(node)
     
     def __remove_connections(self, user, new_connections, current_connections ):
@@ -43,7 +75,6 @@ class Coverage(object):
                 if user in self.s.topology.G.nodes and current_node in self.s.topology.G.nodes:
                     # Remover a aresta da topologia
                     self.s.topology.G.remove_edge(current_node, user)
-                    #self.s.undeploy_module("ats", "Processing_Module", current_node)
                     # Remover o nó da lista de conexões do usuário
                     self.user_connections[user].remove(current_node)
                     # Se o usuário não tiver mais conexões, pode-se limpar a chave no dicionário
@@ -60,7 +91,6 @@ class Coverage(object):
                             possible_conection.append(static)
                     elif self.s.topology.G.nodes[static]["type"] == "SATELLITE":
                         if self.verify_coverage_satellite_node(static, user):
-                            print("satellite node->>>>>", static) 
                             possible_conection.append(static)
             connections = self.connectivity_policy(possible_conection, user)
                 
@@ -84,8 +114,16 @@ class Coverage(object):
         
     
 class CircleCoverage(Coverage):
-    def __init__(self, activation_dist, sim, radius):
-        super().__init__(activation_dist, sim)
+    def __init__(self, activation_dist, sim, radius,bw_ter=0, pr_ter=0, bw_sat=0, time_unit="s"):
+        super().__init__(
+            activation_dist=activation_dist,
+            sim=sim,
+            bw_ter=bw_ter,
+            pr_ter=pr_ter,
+            bw_sat=bw_sat,
+            time_unit=time_unit
+        )
+
         self.radius = radius  # Raio de cobertura em km
     
     def calculate_distance(self, node1, node2):

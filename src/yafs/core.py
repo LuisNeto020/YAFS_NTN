@@ -405,8 +405,13 @@ class Sim:
         
         self.logger.debug("Added_Process - User Mobility\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
-            yield self.env.timeout(user_mobility.get_next_activation())
-            user_mobility.run()
+            next_activation = user_mobility.get_next_activation()
+            if next_activation is not None:
+                yield self.env.timeout(next_activation)
+                user_mobility.run()
+            else:
+                user_mobility.update_pos(next_activation)
+                break
         self.logger.debug("STOP_Process - User Mobility\t#DES:%i" % myId)
         
     def __add_coverage_process(self, coverage):
