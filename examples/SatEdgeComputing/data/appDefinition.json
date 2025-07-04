@@ -1,0 +1,152 @@
+[
+  {
+    "name": "AUGMENTED_REALITY",
+    "id": 0,
+    "module": [
+      {"RAM": 25, "type": "MANAGEMENT", "id": 0, "name": "Client_Module"},
+      {"RAM": 25, "type": "APP", "id": 1, "name": "Processing_Module"}
+    ],
+    "transmission": [
+      {
+        "message_out": "task_data",
+        "message_in": "user_request",
+        "module": "Client_Module"
+      },
+      {
+        "message_out": "task_result",
+        "message_in": "task_data",
+        "module": "Processing_Module"
+      },
+      {
+        "message_in": "task_result",
+        "module": "Client_Module"
+      }
+    ],
+    "message": [
+      {
+        "name": "user_request",
+        "bytes": 12000000,
+        "d": "Client_Module",
+        "s": "None",
+        "id": 0,
+        "instructions": 0
+      },
+      {
+        "name": "task_data",
+        "bytes": 12000000,
+        "d": "Processing_Module",
+        "s": "Client_Module",
+        "id": 1,
+        "instructions": 60000
+      },
+      {
+        "name": "task_result",
+        "bytes": 800000,
+        "d": "Client_Module",
+        "s": "Processing_Module",
+        "id": 2,
+        "instructions": 0
+      }
+    ]
+  },
+  {
+    "name": "E_HEALTH",
+    "id": 1,
+    "module": [
+      {"RAM": 13, "type": "MANAGEMENT", "id": 0, "name": "Client_Module"},
+      {"RAM": 13, "type": "APP", "id": 1, "name": "Processing_Module"}
+    ],
+    "transmission": [
+      {
+        "message_out": "task_data",
+        "message_in": "user_request",
+        "module": "Client_Module"
+      },
+      {
+        "message_out": "task_result",
+        "message_in": "task_data",
+        "module": "Processing_Module"
+      },
+      {
+        "message_in": "task_result",
+        "module": "Client_Module"
+      }
+    ],
+    "message": [
+      {
+        "name": "user_request",
+        "bytes": 80000000,
+        "d": "Client_Module",
+        "s": "None",
+        "id": 0,
+        "instructions": 0
+      },
+      {
+        "name": "task_data",
+        "bytes": 80000000,
+        "d": "Processing_Module",
+        "s": "Client_Module",
+        "id": 1,
+        "instructions": 200000
+      },
+      {
+        "name": "task_result",
+        "bytes": 80000000,
+        "d": "Client_Module",
+        "s": "Processing_Module",
+        "id": 2,
+        "instructions": 0
+      }
+    ]
+  },
+  {
+    "name": "HEAVY_COMP_APP",
+    "id": 2,
+    "module": [
+      {"RAM": 9, "type": "MANAGEMENT", "id": 0, "name": "Client_Module"},
+      {"RAM": 9, "type": "APP", "id": 1, "name": "Processing_Module"}
+    ],
+    "transmission": [
+      {
+        "message_out": "task_data",
+        "message_in": "user_request",
+        "module": "Client_Module"
+      },
+      {
+        "message_out": "task_result",
+        "message_in": "task_data",
+        "module": "Processing_Module"
+      },
+      {
+        "message_in": "task_result",
+        "module": "Client_Module"
+      }
+    ],
+    "message": [
+      {
+        "name": "user_request",
+        "bytes": 400000,
+        "d": "Client_Module",
+        "s": "None",
+        "id": 0,
+        "instructions": 0
+      },
+      {
+        "name": "task_data",
+        "bytes": 400000,
+        "d": "Processing_Module",
+        "s": "Client_Module",
+        "id": 1,
+        "instructions": 15000
+      },
+      {
+        "name": "task_result",
+        "bytes": 400000,
+        "d": "Client_Module",
+        "s": "Processing_Module",
+        "id": 2,
+        "instructions": 0
+      }
+    ]
+  }
+]

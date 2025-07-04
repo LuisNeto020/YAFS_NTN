@@ -25,12 +25,13 @@ class Topology:
 
 
 
-    def __init__(self, logger=None):
+    def __init__(self, logger=None, energy_model=None):
 
         # G is a nx.networkx graph
         self.G = None
         self.nodeAttributes = {}
         self.logger = logger or logging.getLogger(__name__)
+        self.energy_model = energy_model
 
 
 
@@ -260,3 +261,40 @@ class Topology:
         return self.size()
 
 
+
+
+class EnergyModel:
+    """
+    This class is used to model the energy consumption of nodes in the topology.
+    It is a placeholder for future implementations and currently does not contain any functionality.
+    """
+
+    def __init__(self):
+        """
+        Initializes the EnergyModel with maximum consumption values for different states.
+
+        Args:
+            maxActiveConsumption (float): Maximum energy consumption when the node is active.
+            maxIdleConsumption (float): Maximum energy consumption when the node is idle.
+        """
+        
+
+    def update_cpu_energy_consumption(self, topology, node, time_now, duration_secs):
+        """
+        Updates the CPU consumption for a specific node.~~
+
+        Args:
+            node (int): The identifier of the node.
+            consumption (float): The amount of energy consumed by the node.
+        """
+        pass
+    
+    def update_wireless_energy_consumption(self, topology, node_src, node_dst, size_bytes, mode):
+        """
+        Updates the wireless consumption for a specific node.
+
+        Args:
+            node (int): The identifier of the node.
+            consumption (float): The amount of energy consumed by the node.
+        """
+        pass

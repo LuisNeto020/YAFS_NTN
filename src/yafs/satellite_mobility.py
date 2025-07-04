@@ -15,6 +15,7 @@ class SatelliteMobility:
         self.satellites = {}
         self.modules_alloc_sat = {}
         self.node_atr = {}
+        self.consumption_atr = {}
         self.sim = sim
         self.data_cache_path = data_cache_path
         
@@ -22,6 +23,135 @@ class SatelliteMobility:
     def get_next_activation(self):
         return self.next_timestep
     
+    
+    def use_all_sat(self):
+        if os.path.exists(self.data_cache_path):
+            print(f"Arquivo de cache encontrado em '{self.data_cache_path}'. Carregando...")
+            self.df = pd.read_csv(self.data_cache_path)
+            ts = load.timescale()
+            self.df["time"] = self.df["time"].apply(lambda t: ts.utc(pd.to_datetime(t).to_pydatetime()))
+        else:
+            ts = load.timescale()
+            start_time = datetime.fromisoformat(self.json_data["time_interval"]["start_time"].replace("Z", "+00:00"))
+            duration = self.json_data["time_interval"]["duration"]
+            duration_unit = self.json_data["time_interval"]["unit"]
+            interval_value = self.json_data["time_interval"]["check_frequency"]
+
+
+            end_time = start_time + self.__parse_interval_unit(duration, duration_unit)
+            interval = self.__parse_interval_unit(interval_value, duration_unit)
+            #print("tempo final:",end_time)
+
+            min_altitude = self.json_data.get("minimum_altitude_angle", 0.0)
+
+            # 3. Carregar satélites de todas as constelações
+            satellites = []
+            for constellation in self.json_data["constellations"]:
+                satellites += self.__fetch_satellites(constellation, ts)
+                
+            current_time = start_time
+            records = []
+                
+            timestep = 0
+            while current_time <= end_time:
+                t = ts.utc(current_time.year, current_time.month, current_time.day,
+                        current_time.hour, current_time.minute, current_time.second)
+
+                for sat in satellites:
+                    geocentric = sat.at(t)
+                    sat_lat, sat_lon = wgs84.latlon_of(geocentric)
+                    subpoint = geocentric.subpoint()
+                    EARTH_RADIUS_KM = 6371.0
+
+                    # Altura do satélite acima da superfície
+                    #sat_alt_km = subpoint.elevation.km
+                    sat_alt_km = wgs84.height_of(geocentric).km
+                    # Elevação mínima em radianos
+                    epsilon_0_rad = radians(min_altitude)
+                    
+                    # Calcular sin(α0)
+                    sin_alpha_0 = (EARTH_RADIUS_KM / (EARTH_RADIUS_KM + sat_alt_km)) * cos(epsilon_0_rad)
+                    
+                    alpha_0_rad = asin(sin_alpha_0)
+
+                    # Calcular β0
+                    beta_0_rad = radians(90) - epsilon_0_rad - alpha_0_rad
+
+                    # Raio da área visível na superfície
+                    coverage_radius_km = EARTH_RADIUS_KM * beta_0_rad
+    
+                    raan = sat.model.nodeo
+                    mo = sat.model.mo
+
+                    
+                    records.append({
+                        "timestep": timestep,
+                        "time": t,
+                        "satellite_id": sat.name,
+                        "constellation_name": getattr(sat, "constellation_name", "Unknown"),
+                        "latitude": sat_lat.degrees,
+                        "longitude": sat_lon.degrees,
+                        "sub_lat": subpoint.latitude.degrees,
+                        "sub_lon": subpoint.longitude.degrees,
+                        "altitude": subpoint.elevation.km,
+                        "coverage_radius_km": coverage_radius_km,
+                        "coverage_angle_rad": beta_0_rad,
+                        "raan": raan,
+                        "mo": mo
+                    })
+
+                timestep += interval_value
+                current_time += interval
+                
+                
+
+            self.df = pd.DataFrame(records)
+            dtt= pd.DataFrame(records)
+            dtt["time"] = dtt["time"].apply(lambda t: t.utc_iso())
+            dtt.to_csv(self.data_cache_path, index=False)
+        for constellation in self.json_data["constellations"]:
+            name = constellation["name"]
+            
+            # Guardar atributos de nó (IPT, RAM)
+            self.node_atr[name] = (
+                constellation.get("IPT", 500),
+                constellation.get("RAM", 1000)
+            )
+            
+            max_idle = constellation.get("maxIdleConsumption", None)
+            max_active = constellation.get("maxActiveConsumption", None)
+            
+            if max_idle is not None and max_active is not None:
+                self.consumption_atr[name] = {
+                    "maxIdleConsumption": max_idle,
+                    "maxActiveConsumption": max_active
+                }
+            
+        current_data = self.df[self.df['timestep'] == 0]
+        
+        for _, row in current_data.iterrows():
+            sat_id = str(row["satellite_id"])
+            constellation = row["constellation_name"]
+            x = row["latitude"]
+            y = row["longitude"]
+            self.sim.topology.G.add_node(sat_id, type="SATELLITE", IPT=self.node_atr[constellation][0], RAM=self.node_atr[constellation][1])
+            self.sim.topology.G.nodes[sat_id]['pos'] = (row["sub_lat"], row["sub_lon"])
+            self.sim.topology.G.nodes[sat_id]['sub_pos'] = (x,y)
+            self.sim.topology.G.nodes[sat_id]["coverage_radius_km"] = row["coverage_radius_km"]
+            self.sim.topology.G.nodes[sat_id]["coverage_angle_rad"] = row["coverage_angle_rad"]
+            self.sim.topology.G.nodes[sat_id]['time'] = row["time"]
+            self.sim.topology.G.nodes[sat_id]['altitude'] = row["altitude"]
+            self.sim.topology.G.nodes[sat_id]["raan"] = row["raan"]
+            self.sim.topology.G.nodes[sat_id]["mo"] = row["mo"]
+            self.sim.topology.G.nodes[sat_id]["constellation_name"] = row["constellation_name"]
+            self.sim.static_nodes.append(sat_id)
+            if constellation in self.consumption_atr:
+                self.sim.topology.G.nodes[sat_id]["maxIdleConsumption"] = self.consumption_atr[constellation]["maxIdleConsumption"]
+                self.sim.topology.G.nodes[sat_id]["maxActiveConsumption"] = self.consumption_atr[constellation]["maxActiveConsumption"]
+
+        return self.df
+            
+            
     def initial_sat_info(self):
         
         if os.path.exists(self.data_cache_path):
@@ -72,7 +202,6 @@ class SatelliteMobility:
                     windows = visibility_windows.get(sat.name, [])
                     if not self.__is_visible(current_time, windows):
                         continue
-
                     geocentric = sat.at(t)
                     sat_lat, sat_lon = wgs84.latlon_of(geocentric)
                     subpoint = geocentric.subpoint()
@@ -95,6 +224,10 @@ class SatelliteMobility:
                     # Raio da área visível na superfície
                     coverage_radius_km = EARTH_RADIUS_KM * beta_0_rad
                     
+                    raan = sat.model.nodeo
+                    mo = sat.model.mo
+
+                    
                     records.append({
                         "timestep": timestep,
                         "time": t,
@@ -106,7 +239,9 @@ class SatelliteMobility:
                         "sub_lon": subpoint.longitude.degrees,
                         "altitude": subpoint.elevation.km,
                         "coverage_radius_km": coverage_radius_km,
-                        "coverage_angle_rad": beta_0_rad
+                        "coverage_angle_rad": beta_0_rad,
+                        "raan": raan,
+                        "mo": mo
                     })
 
                 timestep += interval_value
@@ -134,6 +269,7 @@ class SatelliteMobility:
                 constellation.get("RAM", 1000)
             )
             
+        print(self.df.head())
         return self.df
     
     def __get_visibility_intervals(self, satellite, observer, ts, start_time, end_time, min_altitude=0.0):
@@ -210,6 +346,11 @@ class SatelliteMobility:
                 self.sim.topology.G.nodes[sat_id]['sub_pos'] = (x,y)
                 self.sim.topology.G.nodes[sat_id]['time'] = row["time"]
                 self.sim.topology.G.nodes[sat_id]['altitude'] = row["altitude"]
+                self.sim.topology.G.nodes[sat_id]["raan"] = row["raan"]
+                self.sim.topology.G.nodes[sat_id]["mo"] = row["mo"]
+                if self.sim.topology.energy_model is not None:
+                    self.sim.topology.energy_model.update_cpu_energy_consumption(self.sim.topology, sat_id, self.sim.env.now, self.__parse_interval_unit(self.next_timestep, 's'))
+
             else:
                 # Adiciona novo satélite visível
                 self.sim.topology.G.add_node(sat_id, type="SATELLITE", IPT=self.node_atr[constellation][0], RAM=self.node_atr[constellation][1])
@@ -219,7 +360,12 @@ class SatelliteMobility:
                 self.sim.topology.G.nodes[sat_id]["coverage_angle_rad"] = row["coverage_angle_rad"]
                 self.sim.topology.G.nodes[sat_id]['time'] = row["time"]
                 self.sim.topology.G.nodes[sat_id]['altitude'] = row["altitude"]
+                self.sim.topology.G.nodes[sat_id]["raan"] = row["raan"]
+                self.sim.topology.G.nodes[sat_id]["mo"] = row["mo"]
+                self.sim.topology.G.nodes[sat_id]["constellation_name"] = row["constellation_name"]
                 self.sim.static_nodes.append(sat_id)
+                if self.sim.topology.energy_model is not None:
+                    self.sim.topology.energy_model.update_cpu_energy_consumption(self.sim.topology, sat_id, self.sim.env.now, self.__parse_interval_unit(self.next_timestep, 's'))
 
                 for app_name, module_name in self.modules_alloc_sat.get(constellation, []):
                     app = self.s.apps[app_name]

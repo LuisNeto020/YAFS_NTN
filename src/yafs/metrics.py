@@ -68,3 +68,21 @@ class Metrics:
     def close(self):
         self.__filef.close()
         self.__filel.close()
+        
+    def save_energy_metrics_to_csv(self, topology, filename="result_energy.csv"):
+        """
+        Saves the accumulated energy consumption of each node into a CSV file.
+        
+        Args:
+            topology: the networkx topology graph (G)
+            filename: name of the output CSV file
+        """
+        with open(filename, mode='w', newline='') as file:
+            writer = csv.writer(file)
+            writer.writerow(["NodeID", "constellation_name", "EnergyConsumption(W)"])
+
+            for node_id, attrs in topology.G.nodes(data=True):
+                const = attrs.get("constellation_name") 
+                energy = attrs.get("ENERGY", 0.0)
+                writer.writerow([node_id, const, energy])
+

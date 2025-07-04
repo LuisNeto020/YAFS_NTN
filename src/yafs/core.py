@@ -295,11 +295,15 @@ class Sim:
                         shift_time = last_used - self.env.now
                         last_used = self.env.now + shift_time + latency_msg_link
 
-                    # print "Send next WakeUp : ", last_used
-                    # print "-" * 30
+                    
 
                     self.last_busy_time[link] = last_used
                     self.env.process(self.__wait_message(message, latency_msg_link, shift_time))
+                    
+                    if self.topology.energy_model is not None:
+                        self.topology.energy_model.update_wireless_energy_consumption(self.topology, link[0], link[1], message.bytes, 0)
+                        self.topology.energy_model.update_wireless_energy_consumption(self.topology, link[0], link[1], message.bytes, 1)
+                    
                 except:
                     #This fact is produced when a node or edge the topology is changed or disappeared
                     self.logger.warning("The initial path assigned is unreachabled. Link: (%s,%s). Routing a new one. %i"%(link[0],link[1],self.env.now))
@@ -318,7 +322,7 @@ class Sim:
                         self.logger.debug("(\t New path given. Message is enrouting again.")
                         # print "\t",msg.path
                         self.network_ctrl_pipe.put(message)
-
+                
 
 
     def __wait_message(self, msg, latency, shift_time):
@@ -427,6 +431,21 @@ class Sim:
             yield self.env.timeout(coverage.get_next_activation())
             coverage.run()
         self.logger.debug("STOP_Process - coverage\t#DES:%i" % myId)
+        
+    def __add_isl_process(self, isl_manager, selectorPath=None):
+        """
+        A DES-process who controls the invocation of isl.run
+        """
+        myId = self.__get_id_process()
+        self.des_process_running[myId] = True
+        self.des_control_process['isl'] = myId
+        
+        self.logger.debug("Added_Process - isl\t#DES:%i" % myId)
+        while not self.stop and self.des_process_running[myId]:
+            yield self.env.timeout(isl_manager.get_next_activation())
+            isl_manager.run()
+            #selectorPath.clear_routing_cache()
+        self.logger.debug("STOP_Process - isl\t#DES:%i" % myId)
 
     def __getIDMessage(self):
         self.__idMessage +=1
@@ -641,8 +660,11 @@ class Sim:
                             type = self.NODE_METRIC
 
                             service_time = self.__update_node_metrics(app_name, module, msg, ides, type)
-
+                            id_node = self.alloc_DES[ides]
+                            att_node = self.topology.G.nodes[id_node]
+                            att_node["cpu_util"] = (1.0, self.env.now, service_time + self.env.now)
                             yield self.env.timeout(service_time)
+                            att_node["cpu_util"] = (0.0, self.env.now, service_time + self.env.now)
                             doBefore = True
 
                         """
@@ -705,7 +727,11 @@ class Sim:
                 "(App:%s#DES:%i#%s)\tModule Pure - Sink Message:\t%s" % (app_name, ides, module, msg.name))
             type = self.SINK_METRIC
             service_time = self.__update_node_metrics(app_name, module, msg, ides, type)
-            yield self.env.timeout(service_time)  # service time is 0
+            id_node = self.alloc_DES[ides]
+            att_node = self.topology.G.nodes[id_node]
+            att_node["cpu_util"] = (1.0, self.env.now, service_time + self.env.now)
+            yield self.env.timeout(service_time)
+            att_node["cpu_util"] = (0.0, self.env.now, service_time + self.env.now)
 
         self.logger.debug("STOP_Process - Module Pure Sink: %s\t#DES:%i" % (module, ides))
 
@@ -1022,6 +1048,9 @@ class Sim:
         
     def deploy_coverage(self, coverage):
         self.env.process(self.__add_coverage_process(coverage))
+        
+    def deploy_isl_manager(self, isl_manager, selectorPath=None):
+        self.env.process(self.__add_isl_process(isl_manager, selectorPath))
 
     def get_alloc_entities(self):
         """ It returns a dictionary of deployed services
@@ -1235,10 +1264,12 @@ class Sim:
 
 
         """
-        RUN
+        RUNv
         """
         self.until = until
         if not test_initial_deploy:
             self.env.run(until) #This does not stop the simpy.simulation at time. We have to force the stop
+            
+        self.metrics.save_energy_metrics_to_csv(self.topology, filename="results/result_energy.csv")
 
         self.metrics.close()
