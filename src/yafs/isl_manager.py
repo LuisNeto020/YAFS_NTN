@@ -56,7 +56,7 @@ class ISLManager(object):
                     pr = pr_in_seconds * unit_factors.get(self.time_unit, 1)
 
                     self.s.topology.G.add_edge(sat, neighbor, BW=self.link_bw, PR=pr)
-                    print(f"Adicionando ISL: {sat} <--> {neighbor}, dist={distance:.2f} km")
+                    #print(f"Adicionando ISL: {sat} <--> {neighbor}, dist={distance:.2f} km")
 
                     
     
@@ -109,7 +109,7 @@ class ISLManager(object):
         ax.set_title(f"ISLs at simulation time {timestep}")
         ax.coastlines()
         ax.add_feature(cfeature.BORDERS, linestyle=':')
-        ax.gridlines(draw_labels=True)
+        ax.gridlines(draw_labels=False)
 
         # Desenhar satélites
         for node, (lat, lon) in pos.items():
@@ -125,6 +125,14 @@ class ISLManager(object):
             if u in pos and v in pos:
                 lat1, lon1 = pos[u]
                 lat2, lon2 = pos[v]
+                
+                if abs(lon1 - lon2) > 180:
+                    # Ajustar longitudes para não cruzar o mapa inteiro
+                    if lon1 > lon2:
+                        lon2 += 360
+                    else:
+                        lon1 += 360
+                
                 ax.plot([lon1, lon2], [lat1, lat2], color='gray', linewidth=0.5, transform=ccrs.PlateCarree())
 
         # Salvar imagem
@@ -160,6 +168,8 @@ class WalkerLikeISLManager(ISLManager):
             return min(diff, 2 * pi - diff)
         
         for sat_id in self.s.static_nodes:
+            if sat_id not in self.s.topology.G.nodes:
+                continue
             node = self.s.topology.G.nodes[sat_id]
             if node["type"] != "SATELLITE":
                 continue
@@ -172,7 +182,7 @@ class WalkerLikeISLManager(ISLManager):
             inter_plane = []
 
             for other_id in self.s.static_nodes:
-                if other_id == sat_id:
+                if other_id == sat_id or other_id not in self.s.topology.G.nodes:
                     continue
                 other = self.s.topology.G.nodes[other_id]
                 if other["type"] != "SATELLITE":

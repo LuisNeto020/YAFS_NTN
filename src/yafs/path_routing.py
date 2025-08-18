@@ -154,7 +154,7 @@ class DeviceSpeedAwareRouting(Selection):
             # print "INT: ",message.dst_int #301
 
             path, des = self.get_path(sim,message.app_name,message,node_src,alloc_DES,alloc_module,traffic,from_des)
-            if len(path[0])>0:
+            if len(path) > 0 and len(path[0])>0:
                 # print path # [[164, 130, 380, 110, 216]]
                 # print des # [40]
 

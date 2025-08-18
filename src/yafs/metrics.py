@@ -29,6 +29,7 @@ class Metrics:
         self.__ff_link = csv.writer(self.__filel)
         self.__ff.writerow(columns_event)
         self.__ff_link.writerow(columns_link)
+        self.path = path
 
     def flush(self):
         self.__filef.flush()
@@ -69,7 +70,7 @@ class Metrics:
         self.__filef.close()
         self.__filel.close()
         
-    def save_energy_metrics_to_csv(self, topology, filename="result_energy.csv"):
+    def save_energy_metrics_to_csv(self, topology):
         """
         Saves the accumulated energy consumption of each node into a CSV file.
         
@@ -77,6 +78,8 @@ class Metrics:
             topology: the networkx topology graph (G)
             filename: name of the output CSV file
         """
+        self.path = self.path.replace("/sim_trace", "")
+        filename=self.path + "/result_energy.csv"
         with open(filename, mode='w', newline='') as file:
             writer = csv.writer(file)
             writer.writerow(["NodeID", "constellation_name", "EnergyConsumption(W)"])

@@ -91,9 +91,9 @@ class RoundRobinSelection(Selection):
 
         # Define a taxa de contagem por tipo
         if node_type == "cloud_synthetic":
-            factor = 8
+            factor = 16
         elif node_type == "edge_synthetic":
-            factor = 2
+            factor = 4
         else:  # mist ou outro
             factor = 1
 

@@ -60,11 +60,11 @@ class Coverage(object):
                         }
                         pr = pr_in_seconds * unit_factors.get(self.time_unit, 1)
                         
-                        self.s.topology.G.add_edge(node, user, BW=self.bw_sat, PR=pr)
-                        print("ligação entre %s e %s com pr %s", node, user, pr)
+                        self.s.topology.G.add_edge(user, node, BW=self.bw_sat, PR=pr)
+                        print("ligação entre %s e %s com pr %s", node, user, pr, self.s.env.now)
                     else:
-                        self.s.topology.G.add_edge(node, user, BW=self.bw_ter, PR=self.pr_ter)
-                        print("ligação entre %s e %s", node, user)
+                        self.s.topology.G.add_edge(user, node, BW=self.bw_ter, PR=self.pr_ter)
+                        print("ligação entre %s e %s", node, user, self.s.env.now)
                 
                     self.user_connections.setdefault(user, []).append(node)
     
@@ -73,19 +73,19 @@ class Coverage(object):
             if current_node not in new_connections:
                 # Verificar se o nó e o usuário existem na topologia antes de remover a aresta
                 if user in self.s.topology.G.nodes and current_node in self.s.topology.G.nodes:
-                    # Remover a aresta da topologia
-                    self.s.topology.G.remove_edge(current_node, user)
-                    # Remover o nó da lista de conexões do usuário
-                    self.user_connections[user].remove(current_node)
-                    # Se o usuário não tiver mais conexões, pode-se limpar a chave no dicionário
-                    if not self.user_connections[user]:
-                        del self.user_connections[user]
+                    if self.s.topology.G.has_edge(current_node, user):
+                        self.s.topology.G.remove_edge(current_node, user)
+                        self.user_connections[user].remove(current_node)
+                        if not self.user_connections[user]:
+                            del self.user_connections[user]
+                        print("removida ligação entre %s e %s", current_node, user, self.s.env.now)
+
     
     def update_connection(self):
         for user in self.s.mobile_users:
             possible_conection = list()
             for static in self.s.static_nodes:
-                if user in self.s.topology.G.nodes:
+                if user in self.s.topology.G.nodes and static in self.s.topology.G.nodes:
                     if self.s.topology.G.nodes[static]["type"] == "STATIC":
                         if self.verify_coverage_static_node(static, user):
                             possible_conection.append(static)
@@ -96,11 +96,11 @@ class Coverage(object):
                 
             # Obter as conexões atuais do usuário
             current_connections = set(self.user_connections.get(user, []))
-
-            # Adicionar novas conexões
-            self.__add_connections(user, connections, current_connections)
             # Remover conexões obsoletas
             self.__remove_connections(user, connections, current_connections)
+            # Adicionar novas conexões
+            self.__add_connections(user, connections, current_connections)
+            
             
     def run(self):
         """
@@ -175,6 +175,12 @@ class CircleCoverage(Coverage):
         """
         Retorna o nó mais próximo entre os possíveis nós com cobertura
         """
+        
+        if self.s.topology.G.nodes[mobile_node]["type"] in ("CLOUD", "EMERGENCY_TIME"):
+            possible_connections = [
+                node for node in possible_connections if self.s.topology.G.nodes[node]["type"] == "SATELLITE"
+            ]
+        
         if not possible_connections:
             return []
         

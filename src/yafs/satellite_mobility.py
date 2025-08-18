@@ -331,8 +331,9 @@ class SatelliteMobility:
                     self.sim.undeploy_module(app_name, module_name, node_id)
                 if node_id in self.sim.topology.G.nodes:
                     print("Satélite removido:", node_id)
-                    self.sim.topology.G.remove_edges_from(list(self.sim.topology.G.edges(node_id)))
-                    self.sim.topology.G.remove_node(node_id)
+                    self.sim.remove_node(node_id)
+                    #self.sim.topology.G.remove_edges_from(list(self.sim.topology.G.edges(node_id)))
+                    #self.sim.topology.G.remove_node(node_id)
 
         for _, row in current_data.iterrows():
             sat_id = str(row["satellite_id"])
@@ -426,9 +427,13 @@ class SatelliteMobility:
                 line2 = sat["line2"]
                 sat_name = sat.get("name", "CustomSat")
                 sats.append(EarthSatellite(line1, line2, sat_name, ts))
-            print(f"[{name}] Loaded {len(sats)} custom satellites")
+            
             for sat in sats:
                 sat.constellation_name = name
+                
+            if name.lower() == "mist_synthetic":
+                sats = [sat for i, sat in enumerate(sats) if i % 10 != 0]  # Remove 1 a cada 10 (i % 10 == 0)
+            print(f"[{name}] Loaded {len(sats)} custom satellites")
             return sats
 
         else:

@@ -1,3 +1,4 @@
+import os
 import pandas as pd
 import numpy as np
 
@@ -107,7 +108,7 @@ def analyse_energy_consumption(energy_csv_path):
     else:
         total_energy_dbw = float('-inf')  # or raise an exception
 
-    return total_energy_dbw, avg_by_constellation
+    return total_avg_energy_watts, avg_by_constellation
 
 
 app_deadlines = {
@@ -116,8 +117,80 @@ app_deadlines = {
     "HEAVY_COMP_APP": 5
 }
 
+
+ALGORITHMS = ["round_robin", "trade_off", "tradi_polling", "weight_greedy"]  # Atualiza conforme necessário
+USER_COUNTS = [100, 200, 300, 400, 500, 600, 700, 800, 900, 1000]
+N_TESTS = 3
+
+BASE_PATH = "D:/YAFS_results/Test_SatEdgeSim/results"
+
+def aggregate_results():
+    summary = []
+
+    for algo in ALGORITHMS:
+        for user_count in USER_COUNTS:
+            delays = []
+            energies = []
+            valid_tasks_list = []
+            invalid_latency_list = []
+            invalid_mobility_list = []
+            cloud_tasks = []
+            edge_tasks = []
+            mist_tasks = []
+
+            for i in range(1, N_TESTS + 1):
+                test_dir = os.path.join(BASE_PATH, algo, str(user_count), f"test_{i}")
+                delay_csv = os.path.join(test_dir, "sim_trace.csv")
+                energy_csv = os.path.join(test_dir, "result_energy.csv")
+
+                try:
+                    (
+                        avg_delay, valid_tasks, invalid_latency, invalid_mobility,
+                        cloud, edge, mist
+                    ) = analyse_e2e_delay(
+                        delay_csv,
+                        start_message="user_request",
+                        end_message="task_result",
+                        app_deadlines=app_deadlines
+                    )
+                    total_dbw, _ = analyse_energy_consumption(energy_csv)
+
+                    # Acumular valores
+                    delays.append(avg_delay)
+                    energies.append(total_dbw)
+                    valid_tasks_list.append(valid_tasks)
+                    invalid_latency_list.append(invalid_latency)
+                    invalid_mobility_list.append(invalid_mobility)
+                    cloud_tasks.append(cloud)
+                    edge_tasks.append(edge)
+                    mist_tasks.append(mist)
+
+                except Exception as e:
+                    print(f"[ERROR] Failed to process {test_dir}: {e}")
+                    continue
+
+            if delays:
+                summary.append({
+                    "algorithm": algo,
+                    "users": user_count,
+                    "avg_e2e_delay": np.mean(delays),
+                    "avg_energy_dbw": np.mean(energies),
+                    "avg_valid_tasks": np.mean(valid_tasks_list),
+                    "avg_invalid_latency": np.mean(invalid_latency_list),
+                    "avg_invalid_mobility": np.mean(invalid_mobility_list),
+                    "avg_cloud_tasks": np.mean(cloud_tasks),
+                    "avg_edge_tasks": np.mean(edge_tasks),
+                    "avg_mist_tasks": np.mean(mist_tasks),
+                })
+
+    summary_df = pd.DataFrame(summary)
+    summary_df.to_csv("aggregated_results.csv", index=False)
+    print(summary_df)
+
+
+
 results = analyse_e2e_delay(
-    "results/sim_trace.csv",
+    "D:/YAFS_results/Test_SatEdgeSim_v2/results/trade_off/1000/test_1/sim_trace.csv",
     start_message="user_request",
     end_message="task_result",
     app_deadlines=app_deadlines
@@ -135,10 +208,72 @@ print(f"Invalid by Mobility: {invalid_mobility}")
 print(f"Valid Tasks in Cloud: {cloud}")
 print(f"Valid Tasks in Edge: {edge}")
 print(f"Valid Tasks in Mist: {mist}")
+total_tasks = valid + invalid_latency + invalid_mobility
+valid_tasks_percentage = (valid / total_tasks) * 100 
+valid_latency_percentage = (invalid_latency / total_tasks) * 100
+valid_mobility_percentage = (invalid_mobility / total_tasks) * 100
+print(f"Valid Tasks Percentage: {valid_tasks_percentage:.2f}%") 
+print(f"Invalid by Latency Percentage: {valid_latency_percentage:.2f}%")
+print(f"Invalid by Mobility Percentage: {valid_mobility_percentage:.2f}%")
 
 
-total_dbw, per_constellation_avg = analyse_energy_consumption("results/result_energy.csv")
+total_dbw, per_constellation_avg = analyse_energy_consumption("D:/YAFS_results/Test_SatEdgeSim_v2/results/trade_off/1000/test_1/result_energy.csv")
 
 print(f"Total average energy (dBW): {total_dbw:.2f}")
 for constellation, avg in per_constellation_avg.items():
-    print(f" - {constellation}: {avg:.4f} W")
+    print(f" - {constellation}: {avg:.10f} W")
+# Executar
+
+
+#aggregate_results()
+
+import matplotlib.pyplot as plt
+
+# Lê os dados do CSV
+# Substitua 'dados.csv' pelo caminho correto do seu arquivo
+df = pd.read_csv('aggregated_results.csv')
+
+# Lista de algoritmos únicos
+algorithms = df['algorithm'].unique()
+
+# Dicionário para mapear cores por algoritmo (opcional)
+colors = {
+    'round_robin': 'blue',
+    'trade_off': 'green',
+    'tradi_polling': 'red',
+    'weight_greedy': 'skyblue',
+}
+
+df['total_tasks'] = df['avg_valid_tasks'] + df['avg_invalid_latency'] + df['avg_invalid_mobility']
+df['success_rate'] = (df['avg_valid_tasks'] / df['total_tasks']) * 100
+df['failed_mobility_rate'] = (df['avg_invalid_mobility'] / df['total_tasks']) * 100
+df['failed_latency_rate'] = (df['avg_invalid_latency'] / df['total_tasks']) * 100
+
+# Função para criar gráfico
+def plot_metric(metric, ylabel, title):
+    plt.figure(figsize=(8, 6))
+    for algo in algorithms:
+        data = df[df['algorithm'] == algo]
+        plt.plot(data['users'], data[metric], marker='o', label=algo, color=colors.get(algo))
+    plt.xlabel('Edge devices count')
+    plt.ylabel(ylabel)
+    plt.title(title)
+    plt.legend()
+    plt.grid(True)
+    plt.tight_layout()
+    plt.show()
+
+# 1. E2E Delay
+plot_metric('avg_e2e_delay', 'Time (s)', 'Average E2E Delay (s)')
+
+# 2. Energy Consumption
+plot_metric('avg_energy_dbw', 'Consumed energy (W)', 'Average Energy Consumption')
+
+# 3. Task Success Rate
+plot_metric('success_rate', 'Success Rate (%)', 'Task Success Rate (%)')
+
+# 4. Failed Tasks by Mobility
+plot_metric('failed_mobility_rate', 'failed rate (%)', 'Task Failed Rate (mobility)(%)')
+
+# 5. Failed Tasks by Latency
+plot_metric('failed_latency_rate', 'failed rate (%)', 'Task Failed Rate (delay)(%)')

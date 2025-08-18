@@ -8,6 +8,7 @@
 import random
 import logging
 
+from matplotlib import pyplot as plt
 import networkx as nx
 
 
@@ -110,11 +111,12 @@ class First_ShortestPath(Selection):
 
         node_src = topology_src #TOPOLOGY SOURCE where the message is generated
         DES_dst = alloc_module[app_name][message.dst]
-
+        #nx.draw(sim.topology.G, with_labels=True)
+        #plt.show()
         #Among all possible path we choose the smallest
         bestPath = []
         bestDES = []
-        print (DES_dst)
+        #print ("1", DES_dst)
         for des in DES_dst:
             dst_node = alloc_DES[des]
             # print "DES Node %i " %dst_node
@@ -122,7 +124,7 @@ class First_ShortestPath(Selection):
             path = list(nx.shortest_path(sim.topology.G, source=node_src, target=dst_node))
             bestPath = [path]
             bestDES  = [des]
-            print (path)
+        #print (bestPath)
 
 
         return bestPath,bestDES

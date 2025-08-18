@@ -1,0 +1,6 @@
+{"initialAllocation": [
+    {"module_name": "UserDevice_Module", "app": "EMERGENCY_APP", "id_resource": "node10082448941"},
+    {"module_name": "Cloud_Module", "app": "EMERGENCY_APP", "id_resource": "cloud"},
+    {"module_name": "Emergency_Service_Module", "app": "EMERGENCY_APP", "id_resource": "node9499514917"}
+    ]
+}

@@ -1,0 +1,82 @@
+[{
+  "name": "EMERGENCY_APP",
+  "id": 1,
+  "module": [
+    { "RAM": 50, "type": "MANAGEMENT", "id": 0, "name": "UserDevice_Module" },
+    { "RAM": 2000, "type": "APP", "id": 1, "name": "Cloud_Module" },
+    { "RAM": 15, "type": "APP", "id": 2, "name": "Database_Module" },
+    { "RAM": 100, "type": "APP", "id": 3, "name": "Emergency_Service_Module" }
+  ],
+  "transmission": [
+    {
+      "message_out": "raw_data_to_cloud",
+      "message_in": "sensor_data",
+      "module": "UserDevice_Module"
+    },
+    {
+      "message_out": "Processed_data_to_db",
+      "message_in": "raw_data_to_cloud",
+      "module": "Cloud_Module"
+    },
+    {
+      "message_out": "Emergency_event",
+      "message_in": "raw_data_to_cloud",
+      "module": "Cloud_Module"
+    },
+    {
+      "message_in": "Processed_data_to_db",
+      "module": "Cloud_Module"
+    },
+    {
+      "message_out": "Emergency_notification",
+      "message_in": "Emergency_event",
+      "module": "Emergency_Service_Module"
+    },
+    {
+      "message_in": "Emergency_notification",
+      "module": "Emergency_Service_Module"
+    }
+  ],
+  "message": [
+    {
+      "id": 0,
+      "name": "sensor_data",
+      "s": "None",
+      "d": "UserDevice_Module",
+      "bytes": 25000000,
+      "instructions": 0
+    },
+    {
+      "id": 1,
+      "name": "raw_data_to_cloud",
+      "s": "UserDevice_Module",
+      "d": "Cloud_Module",
+      "bytes": 25000000,
+      "instructions": 5000
+    },
+    {
+      "id": 2,
+      "name": "Processed_data_to_db",
+      "s": "Cloud_Module",
+      "d": "Cloud_Module",
+      "bytes": 30000000,
+      "instructions": 200
+    },
+    {
+      "id": 3,
+      "name": "Emergency_event",
+      "s": "Cloud_Module",
+      "d": "Emergency_Service_Module",
+      "bytes": 10000000,
+      "instructions": 100
+    },
+    {
+      "id": 4,
+      "name": "Emergency_notification",
+      "s": "Emergency_Service_Module",
+      "d": "Emergency_Service_Module",
+      "bytes": 10000000,
+      "instructions": 0
+    }
+  ]
+}]

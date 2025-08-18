@@ -6,7 +6,7 @@ This module unifies the event-discrete simulation environment with the rest of m
  NOTE: THIS VERSION IS A REDUCED ONE WITHOUT INCLUDE GEOGRAPHICAL LIBS
 
 """
-
+import threading
 
 import logging
 import copy
@@ -57,6 +57,7 @@ class Sim:
         """
         the discrete-event simulator (aka DES)
         """
+        self.phase_coordinator = PhaseCoordinator(self.env)
 
         self.__idProcess = -1
         # an unique indentifier for each process in the DES
@@ -168,8 +169,9 @@ class Sim:
         self.static_nodes = []
         self.there_are_satellites = False
         self.satellites_nodes = []
-
-
+        
+        self.routing_lock = threading.Lock() 
+        
 
     # self.__send_message(app_name, message, idDES, self.SOURCE_METRIC)
     def __send_message(self, app_name, message, idDES, type):
@@ -186,8 +188,11 @@ class Sim:
         """
         #TODO IMPROVE asignation of topo = alloc_DES(IdDES) , It has to move to the get_path process
         try:
-            paths,DES_dst = self.selector_path[app_name].get_path(self,app_name, message, self.alloc_DES[idDES], self.alloc_DES, self.alloc_module, self.last_busy_time,from_des=idDES)
-
+            with self.routing_lock:
+                print(f"entrou no selection {self.env.now}")
+                paths,DES_dst = self.selector_path[app_name].get_path(self,app_name, message, self.alloc_DES[idDES], self.alloc_DES, self.alloc_module, self.last_busy_time,from_des=idDES)
+                print(f"paths: {paths}")
+                print(f"saiu do selection {self.env.now}")
             if DES_dst == [None] or DES_dst==[[]]:
                 self.logger.warning(
                     "(#DES:%i)\t--- Unreacheable DST:\t%s: PATH:%s " % (idDES, message.name, paths))
@@ -276,7 +281,9 @@ class Sim:
                 size_bits = message.bytes
                 #size_bits = message.bytes * 8
                 try:
-                   # transmit = size_bits / (self.topology.get_edge(link)[Topology.LINK_BW] * 1000000.0)  # MBITS!
+                   
+                    # transmit = size_bits / (self.topology.get_edge(link)[Topology.LINK_BW] * 1000000.0)  # MBITS!
+                    #print("este é o link", link)
                     transmit = size_bits / (self.topology.get_edge(link)[Topology.LINK_BW] * 1000000.0)  # MBITS!
                     propagation = self.topology.get_edge(link)[Topology.LINK_PR]
                     latency_msg_link = transmit + propagation
@@ -305,6 +312,10 @@ class Sim:
                         self.topology.energy_model.update_wireless_energy_consumption(self.topology, link[0], link[1], message.bytes, 1)
                     
                 except:
+                    #ed = (link[1], link[0]) 
+                    #ed1 = (link[0], link[1])
+                    #print(f"network top {self.topology.get_edge(ed)} time {self.env.now}")
+                    #print(f"network top1 {self.topology.get_edge(ed1)} time {self.env.now}")
                     #This fact is produced when a node or edge the topology is changed or disappeared
                     self.logger.warning("The initial path assigned is unreachabled. Link: (%s,%s). Routing a new one. %i"%(link[0],link[1],self.env.now))
 
@@ -366,7 +377,12 @@ class Sim:
         self.logger.debug("Added_Process - Placement Algorithm\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
             yield self.env.timeout(placement.get_next_activation())
-            placement.run(self)
+            
+            self.phase_coordinator.add_ready(
+            "placement", 
+            lambda: placement.run(self)
+            )
+            
             self.logger.debug("(DES:%i) %7.4f Run - Placement Policy: %s " % (myId, self.env.now, self.stop))  # Rewrite
         self.logger.debug("STOP_Process - Placement Algorithm\t#DES:%i" % myId)
 
@@ -381,8 +397,14 @@ class Sim:
         self.logger.debug("Added_Process - Population Algorithm\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
             yield self.env.timeout(population.get_next_activation())
+            
             self.logger.debug("(DES:%i) %7.4f Run - Population Policy: %s " % (myId, self.env.now, self.stop))  # REWRITE
-            population.run(self)
+            
+            self.phase_coordinator.add_ready(
+            "population", 
+            lambda: population.run(self)
+            )
+            
         self.logger.debug("STOP_Process - Population Algorithm\t#DES:%i" % myId)
         
     def __add_satellite_mobility_process(self, satellite_mobility):
@@ -396,7 +418,15 @@ class Sim:
         self.logger.debug("Added_Process - Satellite Mobility\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
             yield self.env.timeout(satellite_mobility.get_next_activation())
-            satellite_mobility.run(self.env.now)
+            
+            with self.routing_lock:
+                print(f"entrou no satelite mob {self.env.now}")
+                
+                self.phase_coordinator.add_ready(
+                    "satellite_mobility", 
+                    lambda: satellite_mobility.run(self.env.now)
+                )
+            
         self.logger.debug("STOP_Process - User Mobility\t#DES:%i" % myId)
         
     def __add_user_mobility_process(self, user_mobility):
@@ -412,7 +442,11 @@ class Sim:
             next_activation = user_mobility.get_next_activation()
             if next_activation is not None:
                 yield self.env.timeout(next_activation)
-                user_mobility.run()
+                
+                self.phase_coordinator.add_ready(
+                    "user_mobility", 
+                    lambda: user_mobility.run()
+                )
             else:
                 user_mobility.update_pos(next_activation)
                 break
@@ -429,7 +463,14 @@ class Sim:
         self.logger.debug("Added_Process - Coverage\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
             yield self.env.timeout(coverage.get_next_activation())
-            coverage.run()
+            
+            with self.routing_lock:
+            
+                self.phase_coordinator.add_ready(
+                    "coverage", 
+                    lambda: coverage.run()
+                )
+            
         self.logger.debug("STOP_Process - coverage\t#DES:%i" % myId)
         
     def __add_isl_process(self, isl_manager, selectorPath=None):
@@ -443,8 +484,11 @@ class Sim:
         self.logger.debug("Added_Process - isl\t#DES:%i" % myId)
         while not self.stop and self.des_process_running[myId]:
             yield self.env.timeout(isl_manager.get_next_activation())
-            isl_manager.run()
-            #selectorPath.clear_routing_cache()
+            
+            self.phase_coordinator.add_ready(
+            "isl", 
+            lambda: isl_manager.run()
+            )
         self.logger.debug("STOP_Process - isl\t#DES:%i" % myId)
 
     def __getIDMessage(self):
@@ -1230,6 +1274,7 @@ class Sim:
             for node in self.topology.G.nodes:
                 if self.topology.G.nodes[node]["type"] == "STATIC":
                     self.static_nodes.append(node)
+                    
 
         """
         Creating app.sources and deploy the sources in the topology
@@ -1253,13 +1298,7 @@ class Sim:
         distribution = deterministic_distribution(name="SIM_Deterministic", time=time_shift)
         self.env.process(self.__add_stop_monitor("Stop_Control_Monitor",self.__ctrl_progress_monitor,distribution,show_progress_monitor,time_shift=time_shift))
 
-        # if mobile_behaviour:
-        #     """
-        #     Updating control variables of mobile environment
-        #     """
-        #     self.update_service_coverage()
-
-
+      
         self.print_debug_assignaments()
 
 
@@ -1269,7 +1308,46 @@ class Sim:
         self.until = until
         if not test_initial_deploy:
             self.env.run(until) #This does not stop the simpy.simulation at time. We have to force the stop
-            
-        self.metrics.save_energy_metrics_to_csv(self.topology, filename="results/result_energy.csv")
+          
+        if self.topology.energy_model is not None:    
+            self.metrics.save_energy_metrics_to_csv(self.topology)
 
         self.metrics.close()
+        
+
+class PhaseCoordinator:
+    def __init__(self, env):
+        self.env = env
+        self.ready = {}
+        self.flushing = set()   # para não agendar flush duplicado
+        self.phases = ["satellite_mobility", "isl", "user_mobility",
+                       "coverage", "placement", "population"]
+
+    def add_ready(self, phase, action):
+        now = self.env.now
+        if now not in self.ready:
+            self.ready[now] = []
+        self.ready[now].append((phase, action))
+
+        # agenda um flush no final deste tick
+        if now not in self.flushing:
+            self.flushing.add(now)
+            self.env.process(self._flush(now))
+
+    def _flush(self, t):
+        """Executa todos os processos que ficaram prontos no tempo t"""
+        yield self.env.timeout(0)  # espera até todos em t se registarem
+        procs = self.ready.pop(t, [])
+        self.flushing.discard(t)
+
+        if not procs:
+            return
+
+        if len(procs) == 1:
+            phase, action = procs[0]
+            action()
+        else:
+            procs.sort(key=lambda p: self.phases.index(p[0]))
+            for phase, action in procs:
+                action()
+

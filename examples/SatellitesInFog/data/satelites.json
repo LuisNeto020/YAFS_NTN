@@ -1,0 +1,28 @@
+{
+    "exp_name":"exp1",     
+    "latitude": {
+      "min": 41.493359056483406,
+      "max": 41.83959416566564
+    },
+    "longitude": {
+      "min": -8.449142527278715,
+      "max": -7.796142640586577
+    },
+    "time_interval": {
+      "start_time": "2025-08-05T00:00:00Z",
+      "duration": 3600,
+      "unit": "s",
+      "check_frequency": 60
+    },
+    "constellations": [
+      {
+        "name": "oneweb",
+        "source": "celestrak",
+        "format": "json",
+        "IPT": 25000,
+        "RAM": 4000
+      }
+    ],
+    "minimum_altitude_angle": 10.0
+  }
+  

@@ -14,8 +14,8 @@ class VehicleMap:
         
         # Definir os limites do mapa baseado no SUMO
         self.map_bounds = {
-            "min_lon": -6.972427, "min_lat": 41.533614,
-            "max_lon": -6.951846, "max_lat": 41.543064
+            "min_lon": -8.309739, "min_lat": 41.662532,
+            "max_lon": -7.884646, "max_lat": 41.809652
         }
 
         
@@ -47,9 +47,16 @@ class VehicleMap:
 
         for timestep in timesteps:
             current_data = self.df[self.df["timestep_time"] == timestep]
+            
+            if current_data["vehicle_x"].dropna().empty:
+                x = current_data["person_x"]
+                y = current_data["person_y"]
+            else:
+                x = current_data["vehicle_x"]
+                y = current_data["vehicle_y"]
 
             # Atualizar pontos sem recriar o scatter
-            scatter.set_data(current_data["vehicle_x"], current_data["vehicle_y"])
+            scatter.set_data(x, y)
             ax.set_title(f"Posição dos Veículos - Timestep {timestep}")
 
             # Salvar o frame no OpenCV
@@ -62,6 +69,6 @@ class VehicleMap:
         video_writer.release()
         plt.close(fig)
      
-csv_path = r"C:\Users\WRT511\Sumo\2025-02-24-15-39-40\osm_fcd.csv"        
+csv_path = r"C:\Users\WRT511\OneDrive\Curso\YAFS_NTN\examples\SatellitesAsaBridge\fcd_output_filtered.csv"        
 mapa = VehicleMap(csv_path)
 mapa.plot_vehicles()

@@ -21,6 +21,8 @@ class UserMobility:
     """
     def __init__(self, sim, csv_file, ipt, ram):
         self.df = pd.read_csv(csv_file, delimiter=';')
+        
+        self.df = self.df[self.df['timestep_time'] % 60 == 0]
         self.s = sim
         self.topology = sim.topology  
         self.users = {} #Mapping of vehicle IDs to node IDs in the topology
@@ -60,7 +62,7 @@ class UserMobility:
         """
         current_data = self.df[self.df['timestep_time'] == timestep]
 
-        active_user_m = set(current_data['vehicle_id'])
+        active_user_m = set(current_data['vehicle_id']) | set(current_data['person_id'])
         
         # Remove outdated from the topology
         for user_m_id in list(self.users.keys()):
@@ -68,15 +70,22 @@ class UserMobility:
                 node_id = self.users.pop(user_m_id)  
                 self.s.mobile_users.remove(node_id)
                 if node_id in self.topology.G.nodes:
-                    edges_to_remove = list(self.s.topology.G.edges(node_id))
-                    self.s.topology.G.remove_edges_from(edges_to_remove)
-                    self.topology.G.remove_node(node_id) 
+                    self.s.remove_node(node_id)
+                    #edges_to_remove = list(self.s.topology.G.edges(node_id))
+                    #self.s.topology.G.remove_edges_from(edges_to_remove)
+                    #self.topology.G.remove_node(node_id) 
 
         # Add or update current positions
         for _, row in current_data.iterrows():
-            user_m_id = str(row['vehicle_id'])  
-            user_x = row['vehicle_y']
-            user_y = row['vehicle_x']
+    
+            if pd.notna(row['vehicle_id']):
+                user_m_id = str(row['vehicle_id'])
+                user_x = row['vehicle_y']
+                user_y = row['vehicle_x']
+            else:
+                user_m_id = str(row['person_id'])
+                user_x = row['person_y']
+                user_y = row['person_x']
 
             if user_m_id in self.users and self.users[user_m_id] in self.topology.G.nodes:
                 self.topology.G.nodes[self.users[user_m_id]]['pos'] = (user_x, user_y)

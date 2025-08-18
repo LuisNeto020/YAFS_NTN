@@ -113,8 +113,8 @@
       ],
       "IPT": 250000,
       "RAM": 2000,
-      "maxIdleConsumption": 0.00015,
-      "maxActiveConsumption": 0.016
+      "maxIdleConsumption": 1360,
+      "maxActiveConsumption": 1760
     },
     {
       "name": "edge_synthetic",
@@ -243,8 +243,8 @@
       ],
       "IPT": 210000,
       "RAM": 4000,
-      "maxIdleConsumption": 0.00015,
-      "maxActiveConsumption": 0.016
+      "maxIdleConsumption": 85,
+      "maxActiveConsumption": 110
     },
     {
       "name": "mist_synthetic",
@@ -5253,8 +5253,8 @@
       ],
       "IPT": 37000,
       "RAM": 4000,
-      "maxIdleConsumption": 0.078,
-      "maxActiveConsumption": 3.3
+      "maxIdleConsumption": 87,
+      "maxActiveConsumption": 82
     }
   ],
     "minimum_altitude_angle": 10.0

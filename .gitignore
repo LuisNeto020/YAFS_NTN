@@ -8,3 +8,5 @@
 build/
 src/yafs.egg-info/
 
+*.csv
+*.png

@@ -15,6 +15,9 @@ import logging.config
 from pathlib import Path
 import matplotlib.pyplot as plt
 from Orchestration_algorithms.Round_robin_selection import RoundRobinSelection
+from Orchestration_algorithms.Trade_off_selection import TradeOffSelection
+from Orchestration_algorithms.Tradi_polling_selection import TradiPollingSelection
+from Orchestration_algorithms.Weight_greedy_selection import WeightGreedySelection
 from SatEdgeSim_EnergyModel import DefaultEnergyModel
 from ISL_All import EnhancedISLManager
 
@@ -34,12 +37,12 @@ class OneTimeDistribution(Distribution):
             return float("inf")  # Nunca mais executa
 
 
-def run_simulation():
+def run_simulation(folder_results, selector_class):
     energy_model = DefaultEnergyModel()
     t = Topology(energy_model=energy_model)
     t.G =  nx.Graph()
     
-    s = Sim(t, default_results_path="results/sim_trace")
+    s = Sim(t, default_results_path=folder_results + "/sim_trace")
     
     data = json.load(open("data/satelites.json"))
     sat = SatelliteMobility(s, data, r"C:\Users\WRT511\OneDrive\Curso\YAFS_NTN\examples\SatEdgeComputing\data\sat_data.csv")
@@ -64,7 +67,7 @@ def run_simulation():
     
     dist1 = deterministicDistributionStartPoint(1, 90, name="Deterministic1")
     isl = WalkerLikeISLManager(s, bw=100, time_unit='s', activation_dist=dist1)
-    selectorPath = RoundRobinSelection(isl)
+    selectorPath = selector_class(isl)
     s.deploy_isl_manager(isl, selectorPath=selectorPath)
     
     
@@ -86,20 +89,29 @@ def run_simulation():
     """
     s.run(600)  # To test deployments put test_initial_deploy a TRUE
     s.print_debug_assignaments()
-    nx.draw(t.G, with_labels=True)
-    plt.show()
+    #nx.draw(t.G, with_labels=True)
+    #plt.show()
     
     
-tempos = []
 LOGGING_CONFIG = Path(__file__).parent / 'logging.ini'
 logging.config.fileConfig(LOGGING_CONFIG)
-for i in range(1):
-    print(f"Executando simulação {i+1}/30...")
-    start = time.time()
-    run_simulation()
-    end = time.time()
-    duracao = end - start
-    tempos.append(duracao)
+
+algorithms = {
+    "round_robin": RoundRobinSelection,
+    "trade_off": TradeOffSelection,
+    "tradi_polling": TradiPollingSelection,
+    "weight_greedy": WeightGreedySelection
+}
+#
+
+    
+for algo_name, algo_class in algorithms.items():
+    for i in range(3, 30):
+        print(f"Executando {algo_name} - Simulação {i+1}/...")
+        output_dir = Path(f"D:/YAFS_results/Test_SatEdgeSimmm/results/{algo_name}/900/test_{i+1}")
+        output_dir.mkdir(parents=True, exist_ok=True)
+        run_simulation(str(output_dir), algo_class)
+    
 
 
 print("Finalizado. Resultados guardados em 'resultados_simulacao.txt'.")
