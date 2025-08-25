@@ -1,5 +1,4 @@
 import pandas as pd
-from yafs.distribution import deterministicDistributionStartPoint
 
 class UserMobility:
     """
@@ -71,9 +70,7 @@ class UserMobility:
                 self.s.mobile_users.remove(node_id)
                 if node_id in self.topology.G.nodes:
                     self.s.remove_node(node_id)
-                    #edges_to_remove = list(self.s.topology.G.edges(node_id))
-                    #self.s.topology.G.remove_edges_from(edges_to_remove)
-                    #self.topology.G.remove_node(node_id) 
+                    
 
         # Add or update current positions
         for _, row in current_data.iterrows():

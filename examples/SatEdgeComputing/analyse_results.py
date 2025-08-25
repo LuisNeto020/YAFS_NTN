@@ -66,8 +66,19 @@ def analyse_e2e_delay(csv_path, start_message, end_message, app_deadlines):
                     invalid_by_latency += 1
             else:
                 print(f"Warning: No deadline defined for app '{app_name}' (task {task_id}), skipping...")
-        else:
-            invalid_by_mobility += 1
+        
+            
+    all_ids_in_file = sorted(df['id'].unique())
+    full_expected_ids = set(range(min(all_ids_in_file), max(all_ids_in_file) + 1))
+
+    # Falta de IDs (não aparecem no CSV como um todo)
+    missing_ids = full_expected_ids - set(all_ids_in_file)
+
+    # Falta de tarefas completas (ID aparece, mas incompleto)
+    #incomplete_ids = set(all_ids_in_file) - present_ids
+
+    # Total de inválidos por mobilidade: IDs faltando ou incompletos
+    invalid_by_mobility = len(missing_ids)
 
     average_delay = sum(valid_delays) / len(valid_delays) if valid_delays else 0
 
@@ -225,7 +236,7 @@ for constellation, avg in per_constellation_avg.items():
 # Executar
 
 
-#aggregate_results()
+aggregate_results()
 
 import matplotlib.pyplot as plt
 

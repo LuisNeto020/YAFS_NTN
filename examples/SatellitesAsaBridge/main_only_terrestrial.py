@@ -12,15 +12,14 @@ from yafs.path_routing import DeviceSpeedAwareRouting
 import logging.config
 from pathlib import Path
 import matplotlib.pyplot as plt
-from oneweb_isl_manager import OnewebISLManager
 import matplotlib.pyplot as plt
 import contextily as ctx
 import geopandas as gpd
 from shapely.geometry import Point
 import shapely.affinity
 import math
-from placementAlg import CloudCentricPlacement
-from populationAlg import EvolPop
+from placements.placement_only_terrestrial import CloudCentricPlacement
+from populations.population_only_terrestrial import EvolPop
 from yafs.user_mobility import UserMobility
 from yafs.coverage import CircleCoverage
 
@@ -193,18 +192,7 @@ def run_simulation(folder_results):
     #t.G.add_edge("emergency_time", "ONEWEB-0254", BW=1000, PR=0.001)
 
     s = Sim(t, default_results_path=folder_results + "/sim_trace")
-    s.mobile_users.append("cloud")
-    s.mobile_users.append("cloud1")
-    s.mobile_users.append("cloud2")
-    s.mobile_users.append("cloud3")
-    s.mobile_users.append("cloud4")
-    s.mobile_users.append("emergency_time")
-    s.mobile_users.append("emergency_time1")
-    s.mobile_users.append("emergency_time2")
-    data = json.load(open("data/satelites.json"))
-    sat = SatelliteMobility(s, data, r"C:\Users\WRT511\OneDrive\Curso\YAFS_NTN\examples\SatellitesAsaBridge\data\sat_data.csv")
-    dados = sat.initial_sat_info()
-    s.deploy_satellite_mobility(sat)
+    
     
     """
     APPLICATION or SERVICES
@@ -217,8 +205,7 @@ def run_simulation(folder_results):
     """ 
     SERVICE PLACEMENT 
     """
-    dist_1 = deterministic_distribution(60, name="Deterministic")
-    placement = CloudCentricPlacement(name="Placement", activation_dist=dist_1)
+    placement = CloudCentricPlacement(name="Placement")
     
     dist = deterministic_distribution(60, name="Deterministic")
     population = EvolPop(name="population", activation_dist=dist)
@@ -226,10 +213,6 @@ def run_simulation(folder_results):
     
     selectorPath = DeviceSpeedAwareRouting()
     
-    dist1 = deterministic_distribution(60, name="Deterministic1")
-    isl = WalkerLikeISLManager(s, bw=1000, time_unit='s', activation_dist=dist1)
-    #selectorPath = selector_class(isl)
-    s.deploy_isl_manager(isl)
     
     
     #selectorPath = DeviceSpeedAwareRouting()
@@ -259,14 +242,15 @@ def run_simulation(folder_results):
     """
 
     RUNNING - last step
-    """
+    
     plot_static_nodes(t, map_bounds={
         "min_lon": -8.329739,
         "max_lon": -7.864646,
         "min_lat": 41.642532,
         "max_lat": 41.829652
     })
-    #s.run(3600)  # To test deployments put test_initial_deploy a TRUE
+    """
+    s.run(3600)  # To test deployments put test_initial_deploy a TRUE
     #s.print_debug_assignaments()
     nx.draw(t.G, with_labels=True)
     plt.show()

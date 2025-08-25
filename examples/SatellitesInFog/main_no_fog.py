@@ -14,15 +14,13 @@ from yafs.path_routing import DeviceSpeedAwareRouting
 import logging.config
 from pathlib import Path
 import matplotlib.pyplot as plt
-from oneweb_isl_manager import OnewebISLManager
-import matplotlib.pyplot as plt
 import contextily as ctx
 import geopandas as gpd
 from shapely.geometry import Point
 import shapely.affinity
 import math
-from placementAlg import CloudCentricPlacement
-from populationAlg import EvolPop
+from placements.placement_for_no_fog_computing import CloudCentricPlacement
+from populations.population_for_no_fog_computing import EvolPop
 from yafs.user_mobility import UserMobility
 from yafs.coverage import CircleCoverage
 
@@ -204,9 +202,9 @@ def run_simulation(folder_results):
     s.mobile_users.append("emergency_time1")
     s.mobile_users.append("emergency_time2")
     data = json.load(open("data/satelites.json"))
-    #sat = SatelliteMobility(s, data, r"C:\Users\WRT511\OneDrive\Curso\YAFS_NTN\examples\SatellitesInFog\data\sat_data.csv")
-    #dados = sat.initial_sat_info()
-    #s.deploy_satellite_mobility(sat)
+    sat = SatelliteMobility(s, data, r"C:\Users\WRT511\OneDrive\Curso\YAFS_NTN\examples\SatellitesInFog\data\sat_data.csv")
+    dados = sat.initial_sat_info()
+    s.deploy_satellite_mobility(sat)
     
     """
     APPLICATION or SERVICES
@@ -231,7 +229,7 @@ def run_simulation(folder_results):
     dist1 = deterministic_distribution(60, name="Deterministic1")
     isl = WalkerLikeISLManager(s, bw=1000, time_unit='s', activation_dist=dist1)
     #selectorPath = selector_class(isl)
-    #s.deploy_isl_manager(isl)
+    s.deploy_isl_manager(isl)
     
     
     selectorPath = DeviceSpeedAwareRouting()

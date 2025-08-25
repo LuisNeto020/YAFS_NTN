@@ -312,10 +312,7 @@ class Sim:
                         self.topology.energy_model.update_wireless_energy_consumption(self.topology, link[0], link[1], message.bytes, 1)
                     
                 except:
-                    #ed = (link[1], link[0]) 
-                    #ed1 = (link[0], link[1])
-                    #print(f"network top {self.topology.get_edge(ed)} time {self.env.now}")
-                    #print(f"network top1 {self.topology.get_edge(ed1)} time {self.env.now}")
+                    
                     #This fact is produced when a node or edge the topology is changed or disappeared
                     self.logger.warning("The initial path assigned is unreachabled. Link: (%s,%s). Routing a new one. %i"%(link[0],link[1],self.env.now))
 
